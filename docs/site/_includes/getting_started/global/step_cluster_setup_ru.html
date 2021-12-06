@@ -17,6 +17,7 @@
       В случае использования уже имеющихся сертификатов (включая Self-Signed), необходимо изменить <a href="/ru/documentation/v1/deckhouse-configure-global.html#параметры">глобальные настройки</a> в секции <code>modules.https</code>.
     </span>
   </div>
+{%- unless page.platform_type == 'baremetal' or page.platform_type == 'existing' %}
   <div class="form__row">
     <label class="label" title="Укажите префикс, который будет использоваться при создании ресурсов в облаке">
       Префикс ресурсов, создаваемых в облаке
@@ -43,8 +44,10 @@
        Этот ключ передается cloud-провайдеру в процессе создания виртуальной машины.
     </span>
   </div>
+{%- endunless %}
 </div>
 
+{%- unless page.platform_type == 'baremetal' or page.platform_type == 'existing' %}
 <!-- include getting_started/aws/STEP_PREP_CONF_RU.md -->
 ## Выберите схему размещения
 
@@ -83,6 +86,7 @@
 {{ preset[1].description[page.lang] }}
 </div>
 {% endfor %}
+{%- endunless %}
 
 <script type="text/javascript">
 {% include getting_started/global/partials/getting-started-setup.js %}

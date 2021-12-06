@@ -53,6 +53,17 @@ Resources for the **"{{ preset[1].name[page.lang] }}"** preset.
 {%- endfor %}
 {% endif %}
 
+{% if page.platform_type == 'existing' %}
+{% if page.lang == 'ru' %}
+Описание ресурсов.
+{% else %}
+Resources templates.
+{% endif %}
+{% snippetcut name="resources.yml" selector="resources-yml" %}
+{% include_file "_includes/getting_started/{{ page.platform_code }}/partials/resources.yml.inc" syntax="yaml" %}
+{% endsnippetcut %}
+{% endif %}
+
 {%- for revision in site.data.getting_started.data.global.revisions %}
 {%- if revision =='ce' and page.ee_only == true %}{% continue %}{% endif %}
 <div id='block_other_{{ revision }}' class="tabs__content tabs__content_other{% if revision == 'ce' or page.ee_only == true %} active{% endif %}" markdown="1">
