@@ -75,9 +75,9 @@ The control-plane-manager saves backups to `/etc/kubernetes/deckhouse/backup`. T
 
 **Caution!** This operation is unsafe and breaks the guarantees given by the consensus protocol. Note that it brings the cluster to the state that was saved on the node. Any pending entries will be lost.
 
-## How do I enable event auditing?
+## How do I add audit policies?
 
-Kubernetes [Auditing](https://kubernetes.io/docs/tasks/debug-application-cluster/debug-cluster/) can help you if you need to keep track of operations or troubleshoot the cluster. You can configure it by setting the appropriate [Audit Policy](https://kubernetes.io/docs/tasks/debug-application-cluster/audit/#audit-policy).
+Kubernetes [Auditing](https://kubernetes.io/docs/tasks/debug-application-cluster/debug-cluster/) can help you if you need to keep track of operations in your Namespaces or troubleshoot the cluster. You can configure it by setting the appropriate [Audit Policy](https://kubernetes.io/docs/tasks/debug-application-cluster/audit/#audit-policy). Policies for system Namespace are enabled [by default](#auditing).
 
 Currently, the following fixed parameters of log rotation are in use:
 ```bash
@@ -85,7 +85,7 @@ Currently, the following fixed parameters of log rotation are in use:
 --audit-log-maxbackup=10
 --audit-log-maxsize=100
 ```
-There must be some `log scraper` on master nodes  *(filebeat, promtail)* that will monitor the log directory:
+There must be some `log scraper` on master nodes  *([log-shipper](../460-log-shipper/cr.html#clusterloggingconfig), promtail, filebeat)* that will monitor the log directory:
 ```bash
 /var/log/kube-audit/audit.log
 ```
@@ -99,6 +99,8 @@ Depending on the `Policy` settings and the number of requests to the **apiserver
 If **apiserver** is unable to start, you have to manually disable the `--audit-log-*` parameters in the `/etc/kubernetes/manifests/kube-apiserver.yaml` manifest and restart **apiserver** using the following command:
 ```bash
 docker stop $(docker ps | grep kube-apiserver- | awk '{print $1}')
+# or (depending on your CRI)
+crictl stopp $(crictl pods --name=kube-apiserver -q)
 ```
 After the restart, you will be able to fix the `Secret` or [delete it](#useful-commands).
 

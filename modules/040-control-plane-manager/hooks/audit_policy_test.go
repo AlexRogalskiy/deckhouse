@@ -24,44 +24,52 @@ User-stories:
 package hooks
 
 import (
+	"encoding/base64"
+	"fmt"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
 	. "github.com/deckhouse/deckhouse/testing/hooks"
 )
 
-var _ = Describe("Modules :: controler-plane-manager :: hooks :: audit_policy ::", func() {
+var _ = FDescribe("Modules :: controler-plane-manager :: hooks :: audit_policy ::", func() {
 	const (
 		initValuesString       = `{"controlPlaneManager":{"internal": {}, "apiserver": {"authn": {}, "authz": {}}}}`
 		initConfigValuesString = `{"controlPlaneManager":{"apiserver": {"auditPolicyEnabled": false}}}`
-		stateA                 = `
+		secret                 = `
 apiVersion: v1
 kind: Secret
 metadata:
   name: audit-policy
   namespace: kube-system
 data:
-  audit-policy.yaml: YXBpVmVyc2lvbjogYXVkaXQuazhzLmlvL3YxCmtpbmQ6IFBvbGljeQpydWxlczoKLSBsZXZlbDogTWV0YWRhdGEK
+  audit-policy.yaml: %s
 `
-		stateB = `
-apiVersion: v1
-kind: Secret
-metadata:
-  name: audit-policy
-  namespace: kube-system
-data:
-  audit-policy.yaml: YXBpVmVyc2lvbjogYXVkaXQuazhzLmlvL3YxCmtpbmQ6IFBvbGljeQpydWxlczoKLSBsZXZlbDogTWV0YWRhdGEKICBvbWl0U3RhZ2VzOgogICAgLSAiUmVxdWVzdFJlY2VpdmVkIgo=
+		policyA = `
+apiVersion: audit.k8s.io/v1
+kind: Policy
+rules:
+- level: Metadata
+`
+		policyB = `
+apiVersion: audit.k8s.io/v1
+kind: Policy
+rules:
+- level: Metadata
+  omitStages:
+    - "RequestReceived"
 `
 		invalidPolicy = `
-apiVersion: v1
-kind: Secret
-metadata:
-  name: audit-policy
-  namespace: kube-system
-data:
-  audit-policy.yaml: YXBpVmVyc2lvbjogYXVkaXQuazhzLmlvL3YxCmtpbmQ6IFBvbGljeQpydWxlczoKICBzb21rZXk6IGludmFsaWRvbmUK
+apiVersion: audit.k8s.io/v1
+kind: Policy
+rules:
+  somkey: invalidone
 `
 	)
+
+	policySecret := func(yaml string) string {
+		return fmt.Sprintf(secret, base64.StdEncoding.EncodeToString([]byte(yaml)))
+	}
 
 	f := HookExecutionConfigInit(initValuesString, initConfigValuesString)
 
@@ -96,7 +104,7 @@ data:
 
 	Context("Cluster started with stateA Secret and disabled auditPolicy", func() {
 		BeforeEach(func() {
-			f.BindingContexts.Set(f.KubeStateSet(stateA))
+			f.BindingContexts.Set(f.KubeStateSet(policySecret(policyA)))
 			f.RunHook()
 		})
 
@@ -108,7 +116,7 @@ data:
 
 	Context("Cluster started with stateA Secret and not set auditPolicyEnabled", func() {
 		BeforeEach(func() {
-			f.BindingContexts.Set(f.KubeStateSet(stateA))
+			f.BindingContexts.Set(f.KubeStateSet(policySecret(policyA)))
 			f.ConfigValuesDelete("controlPlaneManager.apiserver.auditPolicyEnabled")
 			f.RunHook()
 		})
@@ -119,21 +127,21 @@ data:
 		})
 	})
 
-	Context("Cluster started with stateA Secret", func() {
+	FContext("Cluster started with stateA Secret", func() {
 		BeforeEach(func() {
-			f.BindingContexts.Set(f.KubeStateSet(stateA))
-			f.ValuesSet("controlPlaneManager.apiserver.auditPolicyEnabled", true)
+			//f.BindingContexts.Set(f.KubeStateSet(policySecret(policyA)))
+			//f.ValuesSet("controlPlaneManager.apiserver.auditPolicyEnabled", true)
 			f.RunHook()
 		})
 
-		It("controlPlaneManager.internal.auditPolicy must be stateA", func() {
+		FIt("controlPlaneManager.internal.auditPolicy must be stateA", func() {
 			Expect(f).To(ExecuteSuccessfully())
-			Expect(f.ValuesGet("controlPlaneManager.internal.auditPolicy").String()).To(Equal("YXBpVmVyc2lvbjogYXVkaXQuazhzLmlvL3YxCmtpbmQ6IFBvbGljeQpydWxlczoKLSBsZXZlbDogTWV0YWRhdGEK"))
+			Expect(base64.StdEncoding.DecodeString(f.ValuesGet("controlPlaneManager.internal.auditPolicy").String())).To(MatchYAML(policyA))
 		})
 
 		Context("Cluster changed to stateB", func() {
 			BeforeEach(func() {
-				f.BindingContexts.Set(f.KubeStateSet(stateB))
+				f.BindingContexts.Set(f.KubeStateSet(policySecret(policyB)))
 				f.ValuesSet("controlPlaneManager.apiserver.auditPolicyEnabled", true)
 				f.RunHook()
 			})

@@ -67,3 +67,10 @@ The upgrade of a **minor version** of any control plane component is performed i
     - Suppose, `maxUsedControlPlaneVersion = 1.20`. In this case, the lowest possible version of the control plane components is `1.19`.
 
 [List of supported Kubernetes versions...](../../supported_versions.html#kubernetes)
+
+## Auditing
+In a cluster with Deckhouse, there is always a policy for logging events related to create, delete and change operations:
+- committed from the names of ServiceAccounts from the "system" Namespace `kube-system, d8- *`;
+- committed with resources in the "system" Namespace `kube-system, d8- *`.
+
+The `auditPolicyEnabled` [configuration](configuration.html) parameter is responsible for enforcing additional policies.
