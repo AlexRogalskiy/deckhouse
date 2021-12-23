@@ -1,7 +1,7 @@
 {{- range $key, $value := .CandiVersionMap.k8s }}
   {{- $version := $key | toString }}
   {{- $patch := $value.patch | toString }}
-  {{- $image_version := printf "%s%s" $version $patch | replace "." "-" }}
+  {{- $image_version := printf "%s.%s" $version $patch | replace "." "-" }}
   {{- $critools_package := "https://packages.cloud.google.com/apt/pool/cri-tools_1.19.0-00_amd64_b6fdfd86c8a3665ab10b9bd9565354977cd5abbaefeb2ee953bc4a13fe7d3326.deb" }}
 ---
 image: {{ $.ModuleName }}/{{ $.ImageName }}-{{ $image_version }}

@@ -1,7 +1,7 @@
 {{- range $key, $value := .CandiVersionMap.k8s }}
   {{- $version := $key | toString }}
   {{- $patch := $value.patch | toString }}
-  {{- $image_version := printf "%s%s" $version $patch | replace "." "-" }}
+  {{- $image_version := printf "%s.%s" $version $patch | replace "." "-" }}
 ---
 image: {{ $.ModuleName }}/{{ $.ImageName }}-{{ $image_version }}
 from: spotify/scratch
