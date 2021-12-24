@@ -3,16 +3,66 @@
 # Please, consider it completely rewritable.
 ############
 
+# to verify
+
+#"global.clusterName"
+#"global.project"
+#"global.clusterIsBootstrapped"
+#"global.discovery.d8SpecificNodeCountByRole"
+#"global.modulesImages.tags"
+#"global.discovery.prometheusScrapeInterval"
+#"global.discovery.clusterUUID"
+#"global.discovery.extensionAPIServerAuthenticationRequestheaderClientCA"
+#"global.discovery.kubernetesCA"
+#"global.discovery.clusterDNSAddress"
+#"global.discovery.clusterDomain"
+#"global.discovery.defaultStorageClass"
+#"global.modulesImages.registry"
+#"global.modulesImages.registryDockercfg"
+#"global.modulesImages.registryScheme"
+#"global.modulesImages.registryCA"
+#"global.modulesImages.registryAddress"
+#"global.modulesImages.registryPath"
+#"global.discovery.podSubnet"
+#"global.discovery.serviceSubnet"
+#"global.discovery.kubernetesVersions"
+#"global.discovery.kubernetesVersion"
+#"global.discovery.kubernetesVersions"
+#"global.discovery.kubernetesVersion"
+#"global.discovery.clusterMasterCount"
+#"global.discovery.clusterControlPlaneIsHighlyAvailable"
+#"global.clusterConfiguration"
+#"global.discovery.podSubnet"
+#"global.discovery.serviceSubnet"
+#"global.discovery.clusterDomain"
+#"global.deckhouseVersion"
+#"global.deckhouseEdition"
+##########################################################
+#"global.modules.resourcesRequests.everyNode.cpu"
+#"global.modules.resourcesRequests.everyNode.memory"
+#"global.modules.resourcesRequests.masterNode.cpu"
+#"global.modules.resourcesRequests.masterNode.memory"
+#"global.modules.resourcesRequests.internal.milliCpuEveryNode"
+#"global.modules.resourcesRequests.internal.memoryEveryNode"
+#"global.modules.resourcesRequests.internal.milliCpuControlPlane"
+#"global.modules.resourcesRequests.internal.memoryControlPlane"
+#"global.modules.resourcesRequests.internal.milliCpuMaster"
+#"global.modules.resourcesRequests.internal.memoryMaster"
+
+#./discovery/prometheus_scrape_interval.go:48:// Hook must store it to `global.discovery.prometheusScrapeInterval`.
+#./discovery/cluster_uuid.go:72:// There is CM kube-system/d8-cluster-uuid with cluster uuid. Hook must store it to `global.discovery.clusterUUID`.
+#./discovery/extension_api_server_authentication.go:49:// hook must store it to `global.discovery.extensionAPIServerAuthenticationRequestheaderClientCA`.
+#./discovery/cluster_domain.go:28:	"github.com/deckhouse/deckhouse/global-hooks/discovery/internal"
+#./discovery/deckhouse_registry.go:156:	// TODO in later releases we can remove `global.modulesImages.registry` and use combination of `registryAddress` and `registryPath`
+#./discovery/cluster_ip_ranges.go:27:	"github.com/deckhouse/deckhouse/global-hooks/discovery/internal"
+#./discovery/cluster_configuration.go:71:	// no cluster configuration — unset global value if there is one.
+
 type: object
 default: {}
 additionalProperties: true
 properties:
-  deckhouseVersion:
-    type: string
-    x-examples: ["dev"]
   clusterConfiguration:
-    default: {}
-    additionalProperties: true
+    # TODO copy from /candi/openapi/cluster_configuration.yaml
     x-examples:
     - podSubnetNodeCIDRPrefix: "24"
       podSubnetCIDR: 10.244.0.0/16
@@ -23,6 +73,110 @@ properties:
       cloud:
         prefix: test
         provider: OpenStack
+    type: object
+    additionalProperties: false
+    required: [ apiVersion, kind, clusterType, kubernetesVersion, podSubnetCIDR, serviceSubnetCIDR, clusterDomain ]
+    properties:
+      apiVersion:
+        type: string
+        enum: [ deckhouse.io/v1, deckhouse.io/v1alpha1 ]
+      kind:
+        type: string
+        enum: [ ClusterConfiguration ]
+      clusterType:
+        type: string
+        enum: [ Cloud, Static ]
+      cloud:
+        type: object
+        required: [ provider ]
+        additionalProperties: false
+        properties:
+          provider:
+            type: string
+            enum:
+              - "OpenStack"
+              - "AWS"
+              - "GCP"
+              - "Yandex"
+              - "vSphere"
+              - "Azure"
+          prefix:
+            type: string
+            pattern: '^[a-z0-9]([-a-z0-9]*[a-z0-9])?$'
+      podSubnetCIDR:
+        type: string
+      podSubnetNodeCIDRPrefix:
+        type: string
+        default: "24"
+      serviceSubnetCIDR:
+        type: string
+      clusterDomain:
+        type: string
+        default: "cluster.local"
+      defaultCRI:
+        type: string
+        enum:
+          - "Docker"
+          - "Containerd"
+          - "NotManaged"
+        default: "Containerd"
+      kubernetesVersion:
+        type: string
+        enum:
+          - "1.19"
+          - "1.20"
+          - "1.21"
+          - "1.22"
+      packagesProxy:
+        type: object
+        additionalProperties: false
+        properties:
+          uri:
+            type: string
+          username:
+            type: string
+          password:
+            type: string
+        oneOf:
+          - properties:
+              uri:
+                type: string
+            additionalProperties: false
+            required: [ uri ]
+          - properties:
+              uri:
+                type: string
+              username:
+                type: string
+              password:
+                type: string
+            additionalProperties: false
+            required: [ uri, username, password ]
+    oneOf:
+      - properties:
+          clusterType:
+            enum: [ Static ]
+      - properties:
+          clusterType:
+            enum: [ Cloud ]
+        cloud: { }
+        required: [ cloud ]
+  clusterIsBootstrapped:
+    type: boolean
+    default: false
+    x-examples: [true]
+    description: |
+      It indicates the cluster is bootstraped.
+      The cluster is considered bootstrapped if configmap d8-system/d8-cluster-is-bootstraped exists or
+      cluster has at least one non-master node
+  deckhouseVersion:
+    type: string
+    x-examples: ["dev"]
+  deckhouseEdition:
+    type: string
+    x-examples: ["ce"]
+    enum: [unknown, CE, FE, EE ]
+
   highAvailability:
     type: boolean
     x-examples: [true, false]
@@ -35,36 +189,154 @@ properties:
     type: object
     default: {}
     properties:
+      clusterControlPlaneIsHighlyAvailable:
+        type: boolean
+        x-examples: [true]
+        default: false
+      clusterMasterCount:
+        type: integer
+        minimum: 1
+        x-examples: [3]
+      podSubnet:
+        type: string
+        pattern: '^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/[0-9]{1,2}$'
+        x-examples: ["10.10.10.10/24"]
+        description:
+          Network subnet for pods
+      serviceSubnet:
+        type: string
+        pattern: '^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}/[0-9]{1,2}$'
+        x-examples: [ "10.10.10.10/24" ]
+        description:
+          Network subnet for k8s services
+      defaultStorageClass:
+        type: string
+        x-examples: ["some-storage-class"]
+        # it is name of resource in kubernetes
+        pattern: '[a-z0-9]([-a-z0-9]*[a-z0-9])?'
+        description: |
+          Default storage class for cluster
+          It gets form storage class annotated as "storageclass.beta.kubernetes.io/is-default-class" or "storageclass.kubernetes.io/is-default-class"
+      clusterDNSAddress:
+        type: string
+        x-examples: ["10.10.10.10"]
+        pattern: '^([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3})$'
+        description: |
+          DNS server in-cluster address
+          It gets form service in kube-system namespace labeled as "kube-dns" or "coredns"
+      kubernetesCA:
+        type: string
+        x-examples: ["k8sCA\nMultiline"]
+        description: |
+          Kubernetes apiserver CA certificate.
+          It gets from /var/run/secrets/kubernetes.io/serviceaccount/ca.crt file
+      prometheusScrapeInterval:
+        type: integer
+        default: 30
+        minimum: 1
+        x-examples:
+        - 30
+        description: Scrape interval for prometheus. In seconds
       clusterUUID:
         type: string
         x-examples: [deadbeef-4bda-11ec-81d3-0242ac130003]
+        description: Unique cluster identifier
       clusterDomain:
         type: string
-        x-examples: [test]
-      clusterControlPlaneIsHighlyAvailable:
-        type: boolean
-        x-examples: [true, false]
+        x-examples: [cluster.local]
+        pattern: '^[0-9a-zA-Z._-]+$'
       d8SpecificNodeCountByRole:
+        # it is map node_role => count
+        # we can have multiple roles, for example every module has our own role
+        additionalProperties: true
         type: object
+        default: {}
         x-examples:
         - system: 2
-      kubernetesVersion:
-        type: string
-        x-examples: [1.19.5, 1.20.5]
+        description: |
+          Map node-role => count.
+          Node will have role 'some-role' if it has label with prefix node-role.deckhouse.io/
+          Do not use label with prefix node-role.deckhouse.io/ on workers nodes!
       podSubnetCIDR:
         type: string
         x-examples: [ 127.0.0.1/24 ]
-      clusterUUID:
-        type: string
-        x-examples: [db74c734-3a68-11ec-ae11-fb594fdec307]
       kubernetesVersions:
         type: array
+        items:
+          type: string
+          # https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
+          pattern: ^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
         x-examples:
         - ["1.19.2"]
+        description: |
+          K8s versions for each control-plane node
+      kubernetesVersion:
+        type: string
+        # https://semver.org/#is-there-a-suggested-regular-expression-regex-to-check-a-semver-string
+        pattern: ^(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$
+        x-examples:
+          - "1.19.2"
+        description: |
+          Effective (minimal from each control plane node) k8s version
       extensionAPIServerAuthenticationRequestheaderClientCA:
         type: string
-        x-examples: [testCA]
+        x-examples: "testCA\nMultiline"
+        description: |
+          The CA for verification requests to our custom modules from clients inside cluster.
+          It gets from kube-system/extension-apiserver-authentication config map
   modulesImages:
+    properties:
+      registryPath:
+        type: string
+        x-examples: ["/deckhouse/ce"]
+        description: |
+          Path part of deckhuse repo
+      registryAddress:
+        type: string
+        x-examples: ["registry.deckhouse.io"]
+        description: |
+          Domain part of deckhuse repo
+      registryCA:
+        type: string
+        x-examples: ["registryCa\nMultiline"]
+        description: |
+          Registry CA certificate
+      registryScheme:
+        type: string
+        enum: ["http", "https"]
+        x-examples: ["https"]
+        description: |
+          Scheme for registry
+      registryDockercfg:
+        type: string
+        x-examples:
+        - eyJhdXRocyI6IHsgInJlZ2lzdHJ5LmRlY2tob3VzZS5pby9kZWNraG91c2UvY2UiOiB7fX19Cg==
+        # source https://regex101.com/r/Pj4Ako/1
+        pattern: ^(?:([a-z0-9A-Z+\/]){4})*([a-z0-9A-Z+\/])(?:([a-z0-9A-Z+\/])==|([a-z0-9A-Z+\/]){2}=|([a-z0-9A-Z+\/]){3})$
+        description: |
+          Docker config for registry from secret from d8-system/deckhouse-registry
+      registry:
+        type: string
+        # source https://regex101.com/r/7oJe0k/1
+        # based on https://regex101.com/library/a98UqN
+        pattern: ^([\w.\-_]+((:\d+|)(/[a-z0-9._-]+/[a-z0-9._-]+))|)(/|)([a-z0-9.\-_]+(/[a-z0-9.\-_]+|))
+        x-examples:
+          - registry.deckhouse.io/deckhouse/ce
+        description: |
+          Deckhouse images repo.
+          It uses in helm teplates for generating container image address.
+          Almost always, concatinateds with tag from modulesImages.tag
+      tags:
+        type: object
+        default: {}
+        # tags map module_name => map<image_name, tag>
+        additionalProperties: true
+        description: |
+          Map module_name => map(image_name => tag)
+          The map loads from /deckhouse/modules/images_tags.json file.
+          That file generated on build stage.
+          See modules_images_werf and modules_images_werf.yaml for additional information.
+          Values from this map uses in helm teplates for generating container image address in deployments sts...
     additionalProperties: true
     type: object
     x-examples:
@@ -75,6 +347,7 @@ properties:
       registryScheme: https
       registryCA: testCA
       tags: {}
+
   modules:
     default: {}
     additionalProperties: true
