@@ -177,9 +177,6 @@ properties:
     x-examples: ["ce"]
     enum: [unknown, CE, FE, EE ]
 
-  highAvailability:
-    type: boolean
-    x-examples: [true, false]
   enabledModules:
     type: array
     x-examples:
@@ -372,7 +369,17 @@ properties:
         type: object
         default: {}
       resourcesRequests:
+        type: object
         x-examples:
         - internal:
             milliCpuControlPlane: 1024
             memoryControlPlane: 536870912
+        properties:
+          everyNode:
+            type: object
+            properties:
+              cpu:
+                type: string
+              memory:
+                type: string
+

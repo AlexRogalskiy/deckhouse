@@ -1,0 +1,152 @@
+# TODO x-examples
+
+type: object
+properties:
+  storageClass:
+    type: string
+    x-doc-default: null
+    description: |
+      The storage class to use with all service components (prometheus, grafana, openvpn, ...).
+        * By default, it is set to null. In this case, service components use `cluster.defaultStorageClass`
+          (which is determined automatically) or `emptyDir` (if `cluster.defaultStorageClass` isn't defined).
+        * Use this parameter only in exceptional circumstances.
+    highAvailability:
+      type: boolean
+      x-examples: [ true ]
+      description: |
+        A global switch to enable the HA mode for modules that support it.
+        The parameter is not defined by default; the decision is made based on the `global.discovery.clusterControlPlaneIsHighlyAvailable` parameter
+  modules:
+    description:
+      Parameters of service components.
+    default: { }
+    additionalProperties: false
+    type: object
+    properties:
+      publicDomainTemplate:
+        type: string
+        x-examples: [ "%s.example.com" ]
+        # only check that is containing %s
+        pattern: '.*%s.*'
+        x-doc-required: true
+        description: |
+          The template with the `%s` key as the dynamic string parameter.
+          Deckhouse will use this template for creating DNS records.
+          The latter are necessary for the internal needs of DH and the operation of the modules.
+          **Do not use** DNS names (nor do create Ingress resources) that match this template to avoid conflicts with the Ingress resources created by Deckhouse.
+          An example of the template: `%s.kube.company.my`. If this parameter is omitted, no Ingress resources will be created.
+      placement:
+        description: parameters regulating the layout of the Deckhouse components.
+        type: object
+        additionalProperties: false
+        properties:
+          customTolerationKey:
+            description:
+              A list of custom toleration keys; use them to allow the deployment of some critical add-ons (such as cni and csi) on dedicated nodes.
+            x-doc-example: |
+              ```yaml
+              customTolerationKeys:
+              - dedicated.example.com
+              - node-dedicated.example.com/master
+              ```
+            type: array
+            items:
+              type: string
+      https:
+        description: |
+          The HTTPS implementation used by the service components
+        type: object
+        additionalProperties: false
+        x-examples:
+          - certManager:
+              clusterIssuerName: letsencrypt
+            mode: CertManager
+          - mode: Disabled
+          - mode: OnlyInURI
+          - mode: CustomCertificate
+            customCertificate:
+              secretName: plainstring
+        properties:
+          mode:
+            type: string
+            description: |
+              The HTTPS usage mode:
+                `Disabled` — in this mode, all service components use HTTP only (some modules may not work, e.g., [user-authn](modules/150-user-authn/));
+                `CertManager` — all service components use HTTPS and get a certificate from the clusterissuer defined in the `certManager.clusterIssuerName` parameter;
+                `CustomCertificate` — all service components use HTTPS using the certificate from the `d8-system` namespace;
+                `OnlyInURI` — all service components use HTTP (in the expectation that an HTTPS load balancer runs in front of them and terminates HTTPS).
+            default: CertManager
+            enum:
+            - Disabled
+            - CertManager
+            - CustomCertificate
+            - OnlyInURI
+          certManager:
+            type: object
+            additionalProperties: false
+            properties:
+              clusterIssuerName:
+                type: string
+                default: 'letsencrypt'
+                x-doc-default: 'letsencrypt'
+                description: |
+                  What ClusterIssuer to use for service components
+                  (currently, `letsencrypt`, `letsencrypt-staging`, `selfsigned` are available; also, you can define your own).
+          customCertificate:
+            type: object
+            default: {}
+            additionalProperties: false
+            properties:
+              secretName:
+                type: string
+                description: |
+                  The name of the secret in the `d8-system` namespace to use with Grafana/Prometheus.
+
+                  This secret must have the [kubernetes.io/tls](https://kubernetes.github.io/ingress-nginx/user-guide/tls/#tls-secrets) format.
+                default: "false"
+                x-doc-default: 'false'
+      resourcesRequests:
+        description: |
+          The amount of CPU and memory allocated to service components.
+        type: object
+        additionalProperties: false
+        properties:
+          everyNode:
+            type: object
+            additionalProperties: false
+            description: |
+              System components running on every cluster node (usually DaemonSets)
+            properties:
+              cpu:
+                description: |
+                  The combined CPU requests for all the components on each node
+                type: string
+                default: "300m"
+                pattern: '^[0-9]+m?$'
+              memory:
+                description: |
+                  The combined memory requests for all the components on each node (default: 512Mi)
+                type: string
+                default: "512Mi"
+                pattern: '^[0-9]+(E|P|T|G|M|K|Ei|Pi|Ti|Gi|Mi|Ki)?$'
+          masterNode:
+            type: object
+            additionalProperties: false
+            description: |
+              System components (control plane and system components on the master nodes).
+              **Caution!** Deckhouse does not manage control plane components in managed clusters, so all resources are allocated to the system components.
+            properties:
+              cpu:
+                description: |
+                  The combined CPU requests for the system components on master nodes in addition to `everyNode`.
+                    * For the Deckhouse-controlled cluster, the default value is calculated automatically: `.status.allocatable.cpu` of the smallest master node (no more than 4 cores) minus `everyNode`.
+                    * For a managed cluster, the default value is 1 core minus `everyNode`.
+                type: string
+                pattern: '^[0-9]+m?$'
+              memory:
+                description: |
+                  The total amount of memory allocated to system components on master nodes in addition to `everyNode`.
+                    * For the Deckhouse-managed cluster, the default value is calculated automatically: `.status.allocatable.memory` of the smallest master node (no more than 8GiB) minus `everyNode`.
+                    * For a managed cluster, the default value is 1GiB minus `everyNode`.
+                type: string
+                pattern: '^[0-9]+(E|P|T|G|M|K|Ei|Pi|Ti|Gi|Mi|Ki)?$'
