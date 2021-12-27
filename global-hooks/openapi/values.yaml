@@ -1,50 +1,51 @@
-############
-# Attention!!! This schema exists only for matrix testing purposes.
-# Please, consider it completely rewritable.
-############
-
-# to verify
-
-#"global.discovery.clusterDomain"
-#"global.discovery.defaultStorageClass"
-#"global.modulesImages.registry"
-#"global.modulesImages.registryDockercfg"
-#"global.modulesImages.registryScheme"
-#"global.modulesImages.registryCA"
-#"global.modulesImages.registryAddress"
-#"global.modulesImages.registryPath"
-#"global.discovery.podSubnet"
-#"global.discovery.serviceSubnet"
-#"global.discovery.kubernetesVersions"
-#"global.discovery.kubernetesVersion"
-#"global.discovery.kubernetesVersions"
-#"global.discovery.kubernetesVersion"
-#"global.discovery.clusterMasterCount"
-#"global.discovery.clusterControlPlaneIsHighlyAvailable"
-#"global.clusterConfiguration"
-#"global.discovery.podSubnet"
-#"global.discovery.serviceSubnet"
-#"global.discovery.clusterDomain"
-#"global.deckhouseVersion"
-#"global.deckhouseEdition"
-##########################################################
-#"global.modules.resourcesRequests.everyNode.cpu"
-#"global.modules.resourcesRequests.everyNode.memory"
-#"global.modules.resourcesRequests.masterNode.cpu"
-#"global.modules.resourcesRequests.masterNode.memory"
-#"global.modules.resourcesRequests.internal.milliCpuEveryNode"
-#"global.modules.resourcesRequests.internal.memoryEveryNode"
-#"global.modules.resourcesRequests.internal.milliCpuControlPlane"
-#"global.modules.resourcesRequests.internal.memoryControlPlane"
-#"global.modules.resourcesRequests.internal.milliCpuMaster"
-#"global.modules.resourcesRequests.internal.memoryMaster"
-
 x-extend:
   schema: config-values.yaml
 type: object
 default: {}
 additionalProperties: true
 properties:
+  internal:
+    additionalProperties: false
+    type: object
+    default: {}
+    properties:
+      modules:
+        default: { }
+        additionalProperties: false
+        type: object
+        properties:
+          resourcesRequests:
+            type: object
+            default: {}
+            additionalProperties: false
+            x-examples:
+            - milliCpuControlPlane: 1024
+              memoryControlPlane: 536870912
+            properties:
+              milliCpuEveryNode:
+                type: number
+                format: double
+                minimum: 0
+              memoryEveryNode:
+                type: integer
+                format: int64
+                minimum: 0
+              milliCpuControlPlane:
+                type: integer
+                format: int64
+                minimum: 0
+              memoryControlPlane:
+                type: integer
+                format: int64
+                minimum: 0
+              milliCpuMaster:
+                type: integer
+                format: int64
+                minimum: 0
+              memoryMaster:
+                type: integer
+                format: int64
+                minimum: 0
   clusterConfiguration:
     # TODO copy from /candi/openapi/cluster_configuration.yaml
     x-examples:
@@ -194,7 +195,7 @@ properties:
         type: string
         x-examples: ["some-storage-class"]
         # it is name of resource in kubernetes
-        pattern: '[a-z0-9]([-a-z0-9]*[a-z0-9])?'
+        pattern: '[a-z0-9]([\-a-z0-9\.]*[a-z0-9])?'
         description: |
           Default storage class for cluster
           It gets form storage class annotated as "storageclass.beta.kubernetes.io/is-default-class" or "storageclass.kubernetes.io/is-default-class"
@@ -330,39 +331,4 @@ properties:
       tags:
         module:
           image: hash
-
-  modules:
-    default: {}
-    additionalProperties: false
-    type: object
-    properties:
-      resourcesRequests:
-        type: object
-        x-examples:
-        - internal:
-            milliCpuControlPlane: 1024
-            memoryControlPlane: 536870912
-        properties:
-          internal:
-            type: object
-            properties:
-              milliCpuEveryNode:
-                type: number
-                format: double
-              memoryEveryNode:
-                type: integer
-                format: int64
-              milliCpuControlPlane:
-                type: integer
-                format: int64
-              memoryControlPlane:
-                type: integer
-                format: int64
-              milliCpuMaster:
-                type: integer
-                format: int64
-              memoryMaster:
-                type: integer
-                format: int64
-
 

@@ -38,12 +38,12 @@ deckhouseVersion: test
 enabledModules: ["vertical-pod-autoscaler-crd", "prometheus", "operator-prometheus-crd"]
 discovery:
   clusterMasterCount: 3
-  prometheusScrapeInterval: 30s
+  prometheusScrapeInterval: 30
   d8SpecificNodeCountByRole:
     system: 1
 modulesImages:
   registry: registry.deckhouse.io/deckhouse/fe
-  registryDockercfg: cfg
+  registryDockercfg: Y2ZnCg==
   registryAddress: registry.deckhouse.io
   registryPath: /deckhouse/fe
   registryCA: CACACA
