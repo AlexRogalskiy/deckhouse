@@ -1,10 +1,9 @@
-# TODO x-examples
-
 type: object
 properties:
   storageClass:
     type: string
     x-doc-default: null
+    x-examples: [ "storage-class" ]
     description: |
       The storage class to use with all service components (prometheus, grafana, openvpn, ...).
         * By default, it is set to null. In this case, service components use `cluster.defaultStorageClass`
@@ -19,7 +18,39 @@ properties:
   modules:
     description:
       Parameters of service components.
-    default: { }
+    x-examples:
+    - publicDomainTemplate: "%s.example.com"
+      placement:
+        customTolerationKey:
+          - dedicated.example.com
+          - node-dedicated.example.com/master
+      https:
+        mode: CustomCertificate
+        customCertificate:
+          secretName: plainstring
+      resourcesRequests:
+        everyNode:
+          cpu: 42m
+          memory: 2G
+        masterNode:
+          cpu: 2
+          memory: 512Mi
+    - publicDomainTemplate: "%s.example.com"
+      placement:
+        customTolerationKey:
+          - dedicated.example.com
+          - node-dedicated.example.com/master
+      https:
+        mode: CertManager
+        certManager:
+          clusterIssuerName: myown
+      resourcesRequests:
+        everyNode:
+          cpu: 42m
+          memory: 2G
+        masterNode:
+          cpu: 2
+          memory: 512Mi
     additionalProperties: false
     type: object
     properties:
