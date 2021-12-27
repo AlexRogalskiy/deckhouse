@@ -79,7 +79,7 @@ k8s:
   '1.19':
     status: end-of-life
     patch: 16
-    cniVfersion: 0.8.7
+    cniVersion: 0.8.7
     bashible: &bashible_k8s_ge_1_19
       <<: *bashible
       ubuntu:
