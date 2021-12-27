@@ -37,7 +37,7 @@ var _ = Describe("Module :: control-plane-manager :: helm template :: arguments 
         memoryControlPlane: 536870912
   modulesImages:
     registry: registry.deckhouse.io
-    registryDockercfg: cfg
+    registryDockercfg: Y2ZnCg==
     tags:
       controlPlaneManager:
         controlPlaneManager: imagehash

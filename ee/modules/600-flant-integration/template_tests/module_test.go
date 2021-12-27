@@ -25,7 +25,7 @@ deckhouseVersion: dev
 enabledModules: ["vertical-pod-autoscaler-crd", "prometheus", "flant-integration", "operator-prometheus-crd", "log-shipper"]
 modulesImages:
   registry: registry.deckhouse.io
-  registryDockercfg: cfg
+  registryDockercfg: Y2ZnCg==
   tags:
     flantIntegration:
       flantPricing: tagstring

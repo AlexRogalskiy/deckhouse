@@ -41,7 +41,7 @@ modules:
   placement: {}
 modulesImages:
   registry: registry.deckhouse.io/deckhouse/ce
-  registryDockercfg: cfg
+  registryDockercfg: Y2ZnCg==
   registryAddress: registry.deckhouse.io
   registryPath: /deckhouse/ce
   registryScheme: https

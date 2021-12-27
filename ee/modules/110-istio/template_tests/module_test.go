@@ -35,7 +35,7 @@ modules:
     mode: CertManager
 modulesImages:
   registry: registry.deckhouse.io
-  registryDockercfg: mydockercfg
+  registryDockercfg: Y2ZnCg==
   tags:
     common:
       kubeRbacProxy: hashstring

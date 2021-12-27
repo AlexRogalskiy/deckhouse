@@ -37,7 +37,7 @@ const globalValues = `
     placement: {}
   modulesImages:
     registry: registry.deckhouse.io
-    registryDockercfg: cfg
+    registryDockercfg: Y2ZnCg==
     tags:
       common:
         csiExternalProvisioner119: imagehash

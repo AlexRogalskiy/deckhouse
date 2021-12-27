@@ -38,7 +38,7 @@ clusterConfiguration:
 enabledModules: ["vertical-pod-autoscaler-crd", "upmeter"]
 modulesImages:
   registry: registry.deckhouse.io
-  registryDockercfg: cfg
+  registryDockercfg: Y2ZnCg==
   tags:
     common:
       kubeCaAuthProxy: tagstring
@@ -76,7 +76,7 @@ internal:
     tls.key: KEYKEYKEY
   disabledProbes: []
   smokeMini:
-    sts: 
+    sts:
       a: {}
       b: {}
       c: {}
