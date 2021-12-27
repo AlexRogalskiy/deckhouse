@@ -18,48 +18,21 @@ properties:
   modules:
     description:
       Parameters of service components.
-    x-examples:
-    - publicDomainTemplate: "%s.example.com"
-      placement:
-        customTolerationKey:
-          - dedicated.example.com
-          - node-dedicated.example.com/master
-      https:
-        mode: CustomCertificate
-        customCertificate:
-          secretName: plainstring
-      resourcesRequests:
-        everyNode:
-          cpu: 42m
-          memory: 2G
-        masterNode:
-          cpu: 2
-          memory: 512Mi
-    - publicDomainTemplate: "%s.example.com"
-      placement:
-        customTolerationKey:
-          - dedicated.example.com
-          - node-dedicated.example.com/master
-      https:
-        mode: CertManager
-        certManager:
-          clusterIssuerName: myown
-      resourcesRequests:
-        everyNode:
-          cpu: 42m
-          memory: 2G
-        masterNode:
-          cpu: 2
-          memory: 512Mi
     additionalProperties: false
     type: object
     properties:
+      ingressClass:
+        type: string
+        default: nginx
+        x-examples: [ "my-ingress" ]
+        description: |
+          The class of the Ingress controller used for service components.
+          It is set to `nginx`  by default.
       publicDomainTemplate:
         type: string
         x-examples: [ "%s.example.com" ]
         # only check that is containing %s
         pattern: '.*%s.*'
-        x-doc-required: true
         description: |
           The template with the `%s` key as the dynamic string parameter.
           Deckhouse will use this template for creating DNS records.
@@ -132,10 +105,42 @@ properties:
                 type: string
                 description: |
                   The name of the secret in the `d8-system` namespace to use with Grafana/Prometheus.
-
                   This secret must have the [kubernetes.io/tls](https://kubernetes.github.io/ingress-nginx/user-guide/tls/#tls-secrets) format.
                 default: "false"
                 x-doc-default: 'false'
+    x-examples:
+      - publicDomainTemplate: "%s.example.com"
+        placement:
+          customTolerationKey:
+            - dedicated.example.com
+            - node-dedicated.example.com/master
+        https:
+          mode: CustomCertificate
+          customCertificate:
+            secretName: plainstring
+        resourcesRequests:
+          everyNode:
+            cpu: 42m
+            memory: 2G
+          masterNode:
+            cpu: 2
+            memory: 512Mi
+      - publicDomainTemplate: "%s.example.com"
+        placement:
+          customTolerationKey:
+            - dedicated.example.com
+            - node-dedicated.example.com/master
+        https:
+          mode: CertManager
+          certManager:
+            clusterIssuerName: myown
+        resourcesRequests:
+          everyNode:
+            cpu: 42m
+            memory: 2G
+          masterNode:
+            cpu: 2
+            memory: 512Mi
       resourcesRequests:
         description: |
           The amount of CPU and memory allocated to service components.
