@@ -32,9 +32,18 @@ func Test(t *testing.T) {
 
 const globalValues = `
 clusterConfiguration:
-  clusterType: "Cloud"
+  apiVersion: deckhouse.io/v1
   cloud:
-    provider: "OpenStack"
+    prefix: myprefix
+    provider: OpenStack
+  clusterDomain: cluster.local
+  clusterType: "Cloud"
+  defaultCRI: Docker
+  kind: ClusterConfiguration
+  kubernetesVersion: "1.19"
+  podSubnetCIDR: 10.111.0.0/16
+  podSubnetNodeCIDRPrefix: "24"
+  serviceSubnetCIDR: 10.222.0.0/16
 enabledModules: ["vertical-pod-autoscaler-crd", "upmeter"]
 modulesImages:
   registry: registry.deckhouse.io

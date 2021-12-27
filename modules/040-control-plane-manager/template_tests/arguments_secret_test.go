@@ -26,15 +26,16 @@ import (
 var _ = Describe("Module :: control-plane-manager :: helm template :: arguments secret", func() {
 
 	const globalValues = `
+  internal:
+    modules:
+      resourcesRequests:
+        milliCpuControlPlane: 1024
+        memoryControlPlane: 536870912
   clusterConfiguration:
     kubernetesVersion: 1.19.15
     clusterType: Cloud
   modules:
     placement: {}
-    resourcesRequests:
-      internal:
-        milliCpuControlPlane: 1024
-        memoryControlPlane: 536870912
   modulesImages:
     registry: registry.deckhouse.io
     registryDockercfg: Y2ZnCg==

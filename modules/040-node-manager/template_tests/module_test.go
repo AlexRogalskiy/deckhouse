@@ -58,11 +58,18 @@ discovery:
   clusterUUID: f49dd1c3-a63a-4565-a06c-625e35587eab
   kubernetesVersion: 1.19.8
 clusterConfiguration:
-  clusterType: Hybrid
-  packagesProxy:
-    url: "http://aaa.bbb:80"
-    username: "test"
-    password: "test"
+  apiVersion: deckhouse.io/v1
+  cloud:
+    prefix: sandbox
+    provider: vSphere
+  clusterDomain: cluster.local
+  clusterType: Cloud
+  defaultCRI: Docker
+  kind: ClusterConfiguration
+  kubernetesVersion: "1.19"
+  podSubnetCIDR: 10.111.0.0/16
+  podSubnetNodeCIDRPrefix: "24"
+  serviceSubnetCIDR: 10.222.0.0/16
 `
 
 // Defaults from openapi/config-values.yaml.

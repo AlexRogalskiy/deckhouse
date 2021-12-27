@@ -1,6 +1,9 @@
 # Default global values section
 global:
   discovery: {}
+  internal:
+    modules:
+      resourcesRequests: {}
   modulesImages: {}
   modules:
     ingressClass: nginx
@@ -13,4 +16,3 @@ global:
       everyNode:
         cpu: 300m
         memory: 512Mi
-      internal: {}

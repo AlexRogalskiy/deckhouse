@@ -42,9 +42,18 @@ func Test(t *testing.T) {
 
 const globalValues = `
   clusterConfiguration:
+    apiVersion: deckhouse.io/v1
     cloud:
       prefix: myprefix
+      provider: GCP
+    clusterDomain: cluster.local
     clusterType: "Cloud"
+    defaultCRI: Docker
+    kind: ClusterConfiguration
+    kubernetesVersion: "1.19"
+    podSubnetCIDR: 10.111.0.0/16
+    podSubnetNodeCIDRPrefix: "24"
+    serviceSubnetCIDR: 10.222.0.0/16
   enabledModules: ["vertical-pod-autoscaler-crd"]
   modules:
     placement: {}
