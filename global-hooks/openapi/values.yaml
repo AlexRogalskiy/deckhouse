@@ -5,16 +5,6 @@
 
 # to verify
 
-#"global.clusterName"
-#"global.project"
-#"global.clusterIsBootstrapped"
-#"global.discovery.d8SpecificNodeCountByRole"
-#"global.modulesImages.tags"
-#"global.discovery.prometheusScrapeInterval"
-#"global.discovery.clusterUUID"
-#"global.discovery.extensionAPIServerAuthenticationRequestheaderClientCA"
-#"global.discovery.kubernetesCA"
-#"global.discovery.clusterDNSAddress"
 #"global.discovery.clusterDomain"
 #"global.discovery.defaultStorageClass"
 #"global.modulesImages.registry"
@@ -49,13 +39,6 @@
 #"global.modules.resourcesRequests.internal.milliCpuMaster"
 #"global.modules.resourcesRequests.internal.memoryMaster"
 
-#./discovery/prometheus_scrape_interval.go:48:// Hook must store it to `global.discovery.prometheusScrapeInterval`.
-#./discovery/cluster_uuid.go:72:// There is CM kube-system/d8-cluster-uuid with cluster uuid. Hook must store it to `global.discovery.clusterUUID`.
-#./discovery/extension_api_server_authentication.go:49:// hook must store it to `global.discovery.extensionAPIServerAuthenticationRequestheaderClientCA`.
-#./discovery/cluster_domain.go:28:	"github.com/deckhouse/deckhouse/global-hooks/discovery/internal"
-#./discovery/deckhouse_registry.go:156:	// TODO in later releases we can remove `global.modulesImages.registry` and use combination of `registryAddress` and `registryPath`
-#./discovery/cluster_ip_ranges.go:27:	"github.com/deckhouse/deckhouse/global-hooks/discovery/internal"
-#./discovery/cluster_configuration.go:71:	// no cluster configuration — unset global value if there is one.
 x-extend:
   schema: config-values.yaml
 type: object
@@ -344,31 +327,15 @@ properties:
       registryPath: /deckhouse/fe
       registryScheme: https
       registryCA: testCA
-      tags: {}
+      tags:
+        module:
+          image: hash
 
   modules:
     default: {}
-    additionalProperties: true
+    additionalProperties: false
     type: object
     properties:
-      publicDomainTemplate:
-        type: string
-        x-examples: ["%s.example.com"]
-      https:
-        type: object
-        x-examples:
-          - certManager:
-              clusterIssuerName: letsencrypt
-            mode: CertManager
-          - mode: Disabled
-          - mode: OnlyInURI
-          - mode: CustomCertificate
-            customCertificate:
-              secretName: plainstring
-      placement:
-        additionalProperties: true
-        type: object
-        default: {}
       resourcesRequests:
         type: object
         x-examples:
@@ -376,11 +343,26 @@ properties:
             milliCpuControlPlane: 1024
             memoryControlPlane: 536870912
         properties:
-          everyNode:
+          internal:
             type: object
             properties:
-              cpu:
-                type: string
-              memory:
-                type: string
+              milliCpuEveryNode:
+                type: number
+                format: double
+              memoryEveryNode:
+                type: integer
+                format: int64
+              milliCpuControlPlane:
+                type: integer
+                format: int64
+              memoryControlPlane:
+                type: integer
+                format: int64
+              milliCpuMaster:
+                type: integer
+                format: int64
+              memoryMaster:
+                type: integer
+                format: int64
+
 
