@@ -177,7 +177,7 @@ properties:
         default: false
       clusterMasterCount:
         type: integer
-        minimum: 1
+        minimum: 0
         x-examples: [3]
       podSubnet:
         type: string

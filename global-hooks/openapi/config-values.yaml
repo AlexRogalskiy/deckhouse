@@ -44,7 +44,7 @@ properties:
         type: object
         additionalProperties: false
         properties:
-          customTolerationKey:
+          customTolerationKeys:
             description:
               A list of custom toleration keys; use them to allow the deployment of some critical add-ons (such as cni and csi) on dedicated nodes.
             x-doc-example: |

@@ -35,7 +35,7 @@ modulesImages:
       alpine: tagstring
       kubeRbacProxy: imagehash
 discovery:
-  prometheusScrapeInterval: 30s
+  prometheusScrapeInterval: 30
   clusterControlPlaneIsHighlyAvailable: true
   clusterMasterCount: 3
   d8SpecificNodeCountByRole:

@@ -44,7 +44,7 @@ properties:
         type: object
         additionalProperties: false
         properties:
-          customTolerationKey:
+          customTolerationKeys:
             description:
               Cписок ключей пользовательских taint'ов.
               Необходимо указывать, чтобы позволить шедулится на выделенные узлы критическим add-on'ам, таким как например cni и csi.

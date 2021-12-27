@@ -54,7 +54,7 @@ discovery:
   clusterControlPlaneIsHighlyAvailable: true
   d8SpecificNodeCountByRole:
     system: 3
-  kubernetesVersion: "1.19"
+  kubernetesVersion: "1.19.0"
   clusterDomain: my.domain
   clusterUUID: aa-bb-cc
 `
