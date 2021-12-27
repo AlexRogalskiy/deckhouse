@@ -26,14 +26,24 @@ import (
 var _ = Describe("Module :: control-plane-manager :: helm template :: arguments secret", func() {
 
 	const globalValues = `
+  clusterConfiguration:
+    apiVersion: deckhouse.io/v1
+    cloud:
+      prefix: sandbox
+      provider: vSphere
+    clusterDomain: cluster.local
+    clusterType: Cloud
+    defaultCRI: Docker
+    kind: ClusterConfiguration
+    kubernetesVersion: "1.19"
+    podSubnetCIDR: 10.111.0.0/16
+    podSubnetNodeCIDRPrefix: "24"
+    serviceSubnetCIDR: 10.222.0.0/16
   internal:
     modules:
       resourcesRequests:
         milliCpuControlPlane: 1024
         memoryControlPlane: 536870912
-  clusterConfiguration:
-    kubernetesVersion: 1.19.15
-    clusterType: Cloud
   modules:
     placement: {}
   modulesImages:
