@@ -56,7 +56,8 @@
 #./discovery/deckhouse_registry.go:156:	// TODO in later releases we can remove `global.modulesImages.registry` and use combination of `registryAddress` and `registryPath`
 #./discovery/cluster_ip_ranges.go:27:	"github.com/deckhouse/deckhouse/global-hooks/discovery/internal"
 #./discovery/cluster_configuration.go:71:	// no cluster configuration — unset global value if there is one.
-
+x-extend:
+  schema: config-values.yaml
 type: object
 default: {}
 additionalProperties: true
