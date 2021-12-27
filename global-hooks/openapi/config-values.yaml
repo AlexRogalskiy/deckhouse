@@ -108,39 +108,6 @@ properties:
                   This secret must have the [kubernetes.io/tls](https://kubernetes.github.io/ingress-nginx/user-guide/tls/#tls-secrets) format.
                 default: "false"
                 x-doc-default: 'false'
-    x-examples:
-      - publicDomainTemplate: "%s.example.com"
-        placement:
-          customTolerationKey:
-            - dedicated.example.com
-            - node-dedicated.example.com/master
-        https:
-          mode: CustomCertificate
-          customCertificate:
-            secretName: plainstring
-        resourcesRequests:
-          everyNode:
-            cpu: 42m
-            memory: 2G
-          masterNode:
-            cpu: 2
-            memory: 512Mi
-      - publicDomainTemplate: "%s.example.com"
-        placement:
-          customTolerationKey:
-            - dedicated.example.com
-            - node-dedicated.example.com/master
-        https:
-          mode: CertManager
-          certManager:
-            clusterIssuerName: myown
-        resourcesRequests:
-          everyNode:
-            cpu: 42m
-            memory: 2G
-          masterNode:
-            cpu: 2
-            memory: 512Mi
       resourcesRequests:
         description: |
           The amount of CPU and memory allocated to service components.
@@ -186,3 +153,36 @@ properties:
                     * For a managed cluster, the default value is 1GiB minus `everyNode`.
                 type: string
                 pattern: '^[0-9]+(E|P|T|G|M|K|Ei|Pi|Ti|Gi|Mi|Ki)?$'
+    x-examples:
+      - publicDomainTemplate: "%s.example.com"
+        placement:
+          customTolerationKey:
+            - dedicated.example.com
+            - node-dedicated.example.com/master
+        https:
+          mode: CustomCertificate
+          customCertificate:
+            secretName: plainstring
+        resourcesRequests:
+          everyNode:
+            cpu: 42m
+            memory: 2G
+          masterNode:
+            cpu: 2
+            memory: 512Mi
+      - publicDomainTemplate: "%s.example.com"
+        placement:
+          customTolerationKey:
+            - dedicated.example.com
+            - node-dedicated.example.com/master
+        https:
+          mode: CertManager
+          certManager:
+            clusterIssuerName: myown
+        resourcesRequests:
+          everyNode:
+            cpu: 42m
+            memory: 2G
+          masterNode:
+            cpu: 2
+            memory: 512Mi
