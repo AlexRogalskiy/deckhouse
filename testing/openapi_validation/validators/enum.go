@@ -57,6 +57,14 @@ var (
 			// vSphere
 			"apiVersions[0].openAPISpec.properties.cloud.properties.provider",
 		},
+		"global-hooks/openapi/values.yaml ": {
+			"properties.clusterConfiguration.properties.apiVersion",
+			"properties.clusterConfiguration.properties.apiVersion",
+			"properties.clusterConfiguration.properties.cloud.properties.provider",
+			"properties.deckhouseEdition",
+			"properties.modulesImages.properties.registryScheme",
+			"properties.modulesImages.properties.registryScheme",
+		},
 		"modules/010-user-authn-crd/crds/dex-provider.yaml": {
 			// v1alpha1 migrated to v1
 			"spec.versions[0].schema.openAPIV3Schema.properties.spec.properties.github.properties.teamNameField",
