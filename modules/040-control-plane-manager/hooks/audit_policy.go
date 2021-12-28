@@ -129,6 +129,21 @@ func appendDefaultPolicyRules(policy *audit.Policy) {
 		Group:     "autoscaling.k8s.io",
 		Resources: []string{"verticalpodautoscalercheckpoints"},
 	})
+	// Drop patches of verticalpodautoscalers by recommender.
+	{
+		rule := audit.PolicyRule{
+			Level: audit.LevelNone,
+			Verbs: []string{"patch"},
+			Users: []string{"system:serviceaccount:kube-system:d8-vertical-pod-autoscaler-recommender"},
+			Resources: []audit.GroupResources{
+				{
+					Group:     "autoscaling.k8s.io",
+					Resources: []string{"verticalpodautoscalers"},
+				},
+			},
+		}
+		policy.Rules = append(policy.Rules, rule)
+	}
 	// Drop upmeterhookprobes.
 	appendDropRule(policy, audit.GroupResources{
 		Group:     "deckhouse.io",
