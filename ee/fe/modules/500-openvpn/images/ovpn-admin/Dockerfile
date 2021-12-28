@@ -18,5 +18,6 @@ RUN go build .
 
 FROM $BASE_PYTHON_ALPINE
 WORKDIR /app
+RUN apk update && apk add bash
 COPY --from=backend /app/ovpn-admin /app
 COPY --from=frontend /app/frontend/static /app/frontend/static
