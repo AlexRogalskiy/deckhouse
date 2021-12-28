@@ -6,7 +6,7 @@ kind: VerticalPodAutoscaler
 metadata:
   name: image-availability-exporter
   namespace: d8-monitoring
-{{ include "helm_lib_module_labels" (list . (dict "app" "image-availability")) | indent 2 }}
+  {{- include "helm_lib_module_labels" (list . (dict "app" "image-availability")) | nindent 2 }}
 spec:
   targetRef:
     apiVersion: "apps/v1"
@@ -21,7 +21,7 @@ kind: Deployment
 metadata:
   name: image-availability-exporter
   namespace: d8-monitoring
-{{ include "helm_lib_module_labels" (list . (dict "app" "image-availability")) | indent 2 }}
+  {{- include "helm_lib_module_labels" (list . (dict "app" "image-availability")) | nindent 2 }}
 spec:
   replicas: 1
   strategy:
@@ -36,16 +36,16 @@ spec:
         module: {{ $.Chart.Name }}
         app: image-availability-exporter
     spec:
-{{- include "helm_lib_node_selector" (tuple . "monitoring") | indent 6 }}
-{{- include "helm_lib_tolerations" (tuple . "monitoring") | indent 6 }}
-{{- include "helm_lib_module_pod_security_context_run_as_user_nobody" . | indent 6 }}
-{{- include "helm_lib_priority_class" (tuple . "cluster-medium") | indent 6 }}
+      {{- include "helm_lib_node_selector" (tuple . "monitoring") | nindent 6 }}
+      {{- include "helm_lib_tolerations" (tuple . "monitoring") | nindent 6 }}
+      {{- include "helm_lib_module_pod_security_context_run_as_user_nobody" . | nindent 6 }}
+      {{- include "helm_lib_priority_class" (tuple . "cluster-medium") | nindent 6 }}
       imagePullSecrets:
       - name: deckhouse-registry
       serviceAccountName: image-availability-exporter
       containers:
       - name: image-availability-exporter
-{{- include "helm_lib_module_container_security_context_read_only_root_filesystem" . | indent 8 }}
+        {{- include "helm_lib_module_container_security_context_read_only_root_filesystem" . | nindent 8 }}
         image: {{ .Values.global.modulesImages.registry }}:{{ .Values.global.modulesImages.tags.extendedMonitoring.imageAvailabilityExporter }}
         args:
         - --bind-address=127.0.0.1:8080
@@ -62,7 +62,7 @@ spec:
   {{- end }}
         resources:
           requests:
-{{- include "helm_lib_module_ephemeral_storage_only_logs" . | indent 12 }}
+            {{- include "helm_lib_module_ephemeral_storage_only_logs" . | nindent 12 }}
   {{- if not (.Values.global.enabledModules | has "vertical-pod-autoscaler-crd") }}
             cpu: "100m"
             memory: "64Mi"
@@ -73,7 +73,7 @@ spec:
             scheme: HTTPS
             port: 8081
       - name: kube-rbac-proxy
-{{- include "helm_lib_module_container_security_context_read_only_root_filesystem" . | indent 8 }}
+        {{- include "helm_lib_module_container_security_context_read_only_root_filesystem" . | nindent 8 }}
         image: {{ .Values.global.modulesImages.registry }}:{{ .Values.global.modulesImages.tags.common.kubeRbacProxy }}
         args:
         - "--secure-listen-address=$(KUBE_RBAC_PROXY_LISTEN_ADDRESS):8081"
@@ -107,5 +107,5 @@ spec:
                   name: image-availability-exporter
         resources:
           requests:
-  {{- include "helm_lib_module_ephemeral_storage_only_logs" . | indent 12 }}
+            {{- include "helm_lib_module_ephemeral_storage_only_logs" . | nindent 12 }}
 {{- end }}
