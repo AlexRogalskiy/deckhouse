@@ -60,6 +60,7 @@ properties:
         provider: OpenStack
     type: object
     additionalProperties: false
+    required: [ apiVersion, kind, clusterType, kubernetesVersion, podSubnetCIDR, serviceSubnetCIDR, clusterDomain ]
     properties:
       apiVersion:
         type: string

@@ -17,6 +17,7 @@ limitations under the License.
 package hooks
 
 import (
+	"fmt"
 	"strconv"
 	"testing"
 
@@ -115,7 +116,28 @@ func calculateEpoch(ngName string, clusterUUID string) string {
 	return calculateUpdateEpoch(TestTimestampForUpdateEpoch, clusterUUID, ngName)
 }
 
+// calculateEpoch is a helper to minimize test changes during implementation of Go hooks.
+func setK8sVersionAsClusterConfig(f *HookExecutionConfig, version string) {
+	cnf := fmt.Sprintf(`
+apiVersion: deckhouse.io/v1
+cloud:
+  prefix: sandbox
+  provider: vSphere
+clusterDomain: cluster.local
+clusterType: Cloud
+defaultCRI: Docker
+kind: ClusterConfiguration
+kubernetesVersion: "%s"
+podSubnetCIDR: 10.111.0.0/16
+podSubnetNodeCIDRPrefix: "24"
+serviceSubnetCIDR: 10.222.0.0/16
+`, version)
+
+	f.ValuesSetFromYaml("global.clusterConfiguration", []byte(cnf))
+}
+
 var _ = Describe("Modules :: node-manager :: hooks :: get_crds ::", func() {
+
 	const (
 		stateNGProper = `
 ---
@@ -1046,7 +1068,7 @@ spec:
     zones: [a,b]
 `
 			f.BindingContexts.Set(f.KubeStateSet(ng + stateICProper))
-			f.ValuesSet("global.clusterConfiguration.kubernetesVersion", "1.16")
+			setK8sVersionAsClusterConfig(f, "1.16")
 			f.ValuesSet("global.discovery.kubernetesVersions.0", "1.16.0")
 			f.ValuesSet("global.discovery.kubernetesVersion", "1.16.0")
 			f.RunHook()
@@ -1077,7 +1099,7 @@ spec:
     zones: [a,b]
 `
 			f.BindingContexts.Set(f.KubeStateSet(ng + stateICProper))
-			f.ValuesSet("global.clusterConfiguration.kubernetesVersion", "1.15")
+			setK8sVersionAsClusterConfig(f, "1.15")
 			f.ValuesSet("global.discovery.kubernetesVersion", "1.16.0")
 			f.ValuesSet("global.discovery.kubernetesVersions.0", "1.16.0")
 			f.RunHook()
@@ -1180,6 +1202,7 @@ spec:
 	Context("Cluster with proper NG, global cri is set to docker", func() {
 		BeforeEach(func() {
 			f.BindingContexts.Set(f.KubeStateSet(stateNGSimple + stateICProper))
+			setK8sVersionAsClusterConfig(f, "1.19")
 			f.ValuesSet("global.clusterConfiguration.defaultCRI", "Docker")
 			f.RunHook()
 		})
@@ -1193,8 +1216,8 @@ spec:
 	Context("Cluster with proper NG, global cri is set to containerd", func() {
 		BeforeEach(func() {
 			f.BindingContexts.Set(f.KubeStateSet(stateNGSimple + stateICProper))
+			setK8sVersionAsClusterConfig(f, "1.19")
 			f.ValuesSet("global.clusterConfiguration.defaultCRI", "Containerd")
-			f.ValuesSet("global.clusterConfiguration.kubernetesVersion", "1.19")
 			f.ValuesSet("global.discovery.kubernetesVersions.0", "1.19.5")
 			f.ValuesSet("global.discovery.kubernetesVersion", "1.19.5")
 			f.RunHook()
@@ -1209,8 +1232,8 @@ spec:
 	Context("Cluster with proper NG, global cri is set to containerd, kubernetesVersion set to 1.16", func() {
 		BeforeEach(func() {
 			f.BindingContexts.Set(f.KubeStateSet(stateNGSimple + stateICProper))
+			setK8sVersionAsClusterConfig(f, "1.16")
 			f.ValuesSet("global.clusterConfiguration.defaultCRI", "Containerd")
-			f.ValuesSet("global.clusterConfiguration.kubernetesVersion", "1.16")
 			f.ValuesSet("global.discovery.kubernetesVersions.0", "1.16.15")
 			f.ValuesSet("global.discovery.kubernetesVersion", "1.16.15")
 			f.RunHook()
@@ -1237,8 +1260,8 @@ spec:
 	Context("Cluster with proper NG, global cri is set to not managed", func() {
 		BeforeEach(func() {
 			f.BindingContexts.Set(f.KubeStateSet(stateNGSimple + stateICProper))
+			setK8sVersionAsClusterConfig(f, "1.19")
 			f.ValuesSet("global.clusterConfiguration.defaultCRI", "NotManaged")
-			f.ValuesSet("global.clusterConfiguration.kubernetesVersion", "1.19")
 			f.ValuesSet("global.discovery.kubernetesVersions.0", "1.19.5")
 			f.ValuesSet("global.discovery.kubernetesVersion", "1.19.5")
 			f.RunHook()
