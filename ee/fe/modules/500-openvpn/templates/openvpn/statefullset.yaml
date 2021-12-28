@@ -93,11 +93,11 @@ spec:
 {{- include "helm_lib_module_ephemeral_storage_logs_with_extra" 10 | indent 12 }}
       - name: {{ .Chart.Name }}-admin
 {{- include "helm_lib_module_container_security_context_read_only_root_filesystem_capabilities_drop_all" . | indent 8 }}
-        image: {{ $.Values.global.modulesImages.registry }}:{{ $.Values.global.modulesImages.tags.openvpn.openvpnWebUi }}
+        image: {{ $.Values.global.modulesImages.registry }}:{{ $.Values.global.modulesImages.tags.openvpn.ovpnAdmin }}
         command:
         - /bin/sh
         - -c
-        - uwsgi --http 127.0.0.1:8000  --processes 1 --master --die-on-term --enable-threads --single-interpreter --vacuum --lazy-apps --wsgi-disable-file-wrapper --harakiri 80 -b 32768 --file app.py --callable app --check-static /app/frontend
+        - /app/ovpn-admin -listen.host="127.0.0.1" --listen.port="8080" --role="master" --ovpn.server.behindLB --ovpn.service="openvpn-external" --mgmt=main=127.0.0.1:8989
         env:
         - name: POD_NAMESPACE
           valueFrom:
