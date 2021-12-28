@@ -16,7 +16,7 @@
 
 set -Eeo pipefail
 
-  . /deckhouse/candi/tools/functions.sh
+. /deckhouse/candi/tools/functions.sh
 
 function check_requirements() {
     check_jq
