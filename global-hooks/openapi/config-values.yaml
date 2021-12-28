@@ -1,4 +1,5 @@
 type: object
+default: {}
 properties:
   storageClass:
     type: string
