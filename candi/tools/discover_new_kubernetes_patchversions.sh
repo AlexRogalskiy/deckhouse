@@ -25,7 +25,7 @@ function check_requirements() {
 }
 
 # Updates version map with new patchversion
-# update_version_mao VERSION PATCH
+# update_version_map VERSION PATCH
 function update_version_map() {
   local NEW_DIGEST
   yq -i e ".k8s.\"${1}\".patch = ${2}" /deckhouse/candi/version_map.yml
