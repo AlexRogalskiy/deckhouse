@@ -32,10 +32,10 @@ import (
 	. "github.com/deckhouse/deckhouse/testing/hooks"
 )
 
-var _ = FDescribe("Modules :: controler-plane-manager :: hooks :: audit_policy ::", func() {
+var _ = Describe("Modules :: controler-plane-manager :: hooks :: audit_policy ::", func() {
 	const (
 		initValuesString       = `{"controlPlaneManager":{"internal": {}, "apiserver": {"authn": {}, "authz": {}}}}`
-		initConfigValuesString = `{"controlPlaneManager":{"apiserver": {"auditPolicyEnabled": false}}}`
+		initConfigValuesString = `{"controlPlaneManager":{"apiserver": {}}}`
 		secret                 = `
 apiVersion: v1
 kind: Secret
@@ -59,7 +59,7 @@ rules:
   omitStages:
     - "RequestReceived"
 `
-		invalidPolicy = `
+		policyInvalid = `
 apiVersion: audit.k8s.io/v1
 kind: Policy
 rules:
@@ -92,17 +92,17 @@ rules:
 	Context("Invalid policy set", func() {
 		BeforeEach(func() {
 			f.ValuesSet("controlPlaneManager.apiserver.auditPolicyEnabled", true)
-			f.BindingContexts.Set(f.KubeStateSet(invalidPolicy))
+			f.BindingContexts.Set(f.KubeStateSet(policySecret(policyInvalid)))
 			f.RunHook()
 		})
 
 		It("Must fail on yaml validation", func() {
 			Expect(f).To(Not(ExecuteSuccessfully()))
-			Expect(f.GoHookError).Should(MatchError("invalid policy.yaml format"))
+			Expect(f.GoHookError).Should(MatchError("invalid audit-policy.yaml format: error unmarshaling JSON: while decoding JSON: json: cannot unmarshal object into Go struct field Policy.rules of type []v1.PolicyRule"))
 		})
 	})
 
-	Context("Cluster started with stateA Secret and disabled auditPolicy", func() {
+	Context("Cluster started with Secret containing policyA and disabled auditPolicy", func() {
 		BeforeEach(func() {
 			f.BindingContexts.Set(f.KubeStateSet(policySecret(policyA)))
 			f.RunHook()
@@ -114,7 +114,7 @@ rules:
 		})
 	})
 
-	Context("Cluster started with stateA Secret and not set auditPolicyEnabled", func() {
+	Context("Cluster started with Secret containing policyA and not set auditPolicyEnabled", func() {
 		BeforeEach(func() {
 			f.BindingContexts.Set(f.KubeStateSet(policySecret(policyA)))
 			f.ConfigValuesDelete("controlPlaneManager.apiserver.auditPolicyEnabled")
@@ -127,28 +127,28 @@ rules:
 		})
 	})
 
-	FContext("Cluster started with stateA Secret", func() {
+	Context("Cluster started with Secret containing policyB", func() {
 		BeforeEach(func() {
-			//f.BindingContexts.Set(f.KubeStateSet(policySecret(policyA)))
-			//f.ValuesSet("controlPlaneManager.apiserver.auditPolicyEnabled", true)
+			f.BindingContexts.Set(f.KubeStateSet(policySecret(policyA)))
+			f.ValuesSet("controlPlaneManager.apiserver.auditPolicyEnabled", true)
 			f.RunHook()
 		})
 
-		FIt("controlPlaneManager.internal.auditPolicy must be stateA", func() {
+		It("controlPlaneManager.internal.auditPolicy must be policyA", func() {
 			Expect(f).To(ExecuteSuccessfully())
 			Expect(base64.StdEncoding.DecodeString(f.ValuesGet("controlPlaneManager.internal.auditPolicy").String())).To(MatchYAML(policyA))
 		})
 
-		Context("Cluster changed to stateB", func() {
+		Context("Policy changed to policyB", func() {
 			BeforeEach(func() {
 				f.BindingContexts.Set(f.KubeStateSet(policySecret(policyB)))
 				f.ValuesSet("controlPlaneManager.apiserver.auditPolicyEnabled", true)
 				f.RunHook()
 			})
 
-			It("controlPlaneManager.internal.auditPolicy must be stateB", func() {
+			It("controlPlaneManager.internal.auditPolicy must be policyB", func() {
 				Expect(f).To(ExecuteSuccessfully())
-				Expect(f.ValuesGet("controlPlaneManager.internal.auditPolicy").String()).To(Equal("YXBpVmVyc2lvbjogYXVkaXQuazhzLmlvL3YxCmtpbmQ6IFBvbGljeQpydWxlczoKLSBsZXZlbDogTWV0YWRhdGEKICBvbWl0U3RhZ2VzOgogICAgLSAiUmVxdWVzdFJlY2VpdmVkIgo="))
+				Expect(base64.StdEncoding.DecodeString(f.ValuesGet("controlPlaneManager.internal.auditPolicy").String())).To(MatchYAML(policyB))
 			})
 		})
 	})

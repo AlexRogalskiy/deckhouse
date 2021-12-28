@@ -105,6 +105,11 @@ properties:
         default: false
         description: |
           Enforce [additional audit policies](faq.html#how-do-i-add-audit-policies) using the configuration from the `Secret` (`audit-policy` in the `kube-system` namespace).
+      defaultAuditPolicyEnabled:
+        type: boolean
+        default: true
+        description: |
+          Enforce default Deckhouse audit policies.
   etcd:
     type: object
     description: |

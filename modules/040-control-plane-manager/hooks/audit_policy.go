@@ -34,9 +34,6 @@ import (
 	"sigs.k8s.io/yaml"
 )
 
-var systemNamespaces = []string{"kube-system", "d8-cert-manager", "d8-chrony", "d8-cloud-instance-manager", "d8-cloud-provider-aws", "d8-cloud-provider-azure", "d8-cloud-provider-gcp", "d8-cloud-provider-openstack", "d8-cloud-provider-vsphere", "d8-cloud-provider-yandex", "d8-cni-flannel", "d8-cni-simple-bridge", "d8-descheduler", "d8-flant-integration", "d8-ingress-nginx", "d8-istio", "d8-keepalived", "d8-local-path-provisioner", "d8-log-shipper", "d8-metallb", "d8-monitoring", "d8-network-gateway", "d8-okmeter", "d8-openvpn", "d8-operator-prometheus", "d8-pod-reloader", "d8-system", "d8-user-authn", "d8-user-authz", "d8-upmeter"}
-var systemSA = []string{"system:serviceaccount:d8-system:deckhouse"}
-
 var _ = sdk.RegisterFunc(&go_hook.HookConfig{
 	Queue:        moduleQueue,
 	OnBeforeHelm: &go_hook.OrderedConfig{Order: 10},
@@ -71,6 +68,35 @@ func filterAuditSecret(unstructured *unstructured.Unstructured) (go_hook.FilterR
 	return data, nil
 }
 
+func handleAuditPolicy(input *go_hook.HookInput) error {
+	var policy audit.Policy
+
+	if input.Values.Get("controlPlaneManager.apiserver.defaultAuditPolicyEnabled").Bool() == true {
+		appendDefaultPolicyRules(&policy)
+	}
+
+	snap := input.Snapshots["kube_audit_policy_secret"]
+	if input.Values.Get("controlPlaneManager.apiserver.auditPolicyEnabled").Bool() && len(snap) > 0 {
+		data := snap[0].([]byte)
+		err := appendAdditionalPolicyRules(&policy, &data)
+		if err != nil {
+			return err
+		}
+	}
+
+	if len(policy.Rules) == 0 {
+		input.Values.Remove("controlPlaneManager.internal.auditPolicy")
+		return nil
+	}
+
+	data, err := serializePolicy(&policy)
+	if err != nil {
+		return err
+	}
+	input.Values.Set("controlPlaneManager.internal.auditPolicy", data)
+	return nil
+}
+
 func appendDropRule(policy *audit.Policy, resource audit.GroupResources) {
 	rule := audit.PolicyRule{
 		Level: audit.LevelNone,
@@ -81,33 +107,33 @@ func appendDropRule(policy *audit.Policy, resource audit.GroupResources) {
 	policy.Rules = append(policy.Rules, rule)
 }
 
-func handleAuditPolicy(input *go_hook.HookInput) error {
-	var policy audit.Policy
-
+func appendDefaultPolicyRules(policy *audit.Policy) {
 	// Drop events on endpoints and events resources.
-	// todo(31337Ghost) consider to drop only particular endpoints events + mcm triggered
-	// https://github.com/kubernetes/kubernetes/blob/master/cluster/gce/gci/configure-helper.sh#L1195
-	appendDropRule(&policy, audit.GroupResources{
+	appendDropRule(policy, audit.GroupResources{
 		Group:     "",
 		Resources: []string{"endpoints", "events"},
 	})
 	// Drop leader elections based on leases resource.
-	appendDropRule(&policy, audit.GroupResources{
+	appendDropRule(policy, audit.GroupResources{
 		Group:     "coordination.k8s.io",
 		Resources: []string{"leases"},
 	})
 	// Drop cert-manager's leader elections based on configmap resources.
-	appendDropRule(&policy, audit.GroupResources{
+	appendDropRule(policy, audit.GroupResources{
 		Group:         "",
 		Resources:     []string{"configmaps"},
 		ResourceNames: []string{"cert-manager-cainjector-leader-election", "cert-manager-controller"},
 	})
 	// Drop verticalpodautoscalercheckpoints.
-	appendDropRule(&policy, audit.GroupResources{
+	appendDropRule(policy, audit.GroupResources{
 		Group:     "autoscaling.k8s.io",
 		Resources: []string{"verticalpodautoscalercheckpoints"},
 	})
-
+	// Drop upmeterhookprobes.
+	appendDropRule(policy, audit.GroupResources{
+		Group:     "deckhouse.io",
+		Resources: []string{"upmeterhookprobes"},
+	})
 	// Drop everything related to d8-upmeter namespace.
 	{
 		rule := audit.PolicyRule{
@@ -116,11 +142,6 @@ func handleAuditPolicy(input *go_hook.HookInput) error {
 		}
 		policy.Rules = append(policy.Rules, rule)
 	}
-	// Drop upmeterhookprobes.
-	appendDropRule(&policy, audit.GroupResources{
-		Group:     "deckhouse.io",
-		Resources: []string{"upmeterhookprobes"},
-	})
 
 	// A rule collecting logs about actions of service accounts from system namespaces.
 	{
@@ -135,42 +156,41 @@ func handleAuditPolicy(input *go_hook.HookInput) error {
 		}
 		policy.Rules = append(policy.Rules, rule)
 	}
-	// A rule collecting logs about all actions taken on the resources from system namespaces.
+	// A rule collecting logs about actions taken on the resources in system namespaces.
 	{
 		rule := audit.PolicyRule{
 			Level:      audit.LevelMetadata,
 			Verbs:      []string{"create", "update", "patch", "delete"},
-			Namespaces: systemNamespaces,
+			Namespaces: systemNamespace,
 			OmitStages: []audit.Stage{
 				audit.StageRequestReceived,
 			},
 		}
 		policy.Rules = append(policy.Rules, rule)
 	}
+}
 
-	policyEnabled := input.Values.Get("controlPlaneManager.apiserver.auditPolicyEnabled")
-	snap := input.Snapshots["kube_audit_policy_secret"]
-
-	if policyEnabled.Bool() && len(snap) > 0 {
-		data := snap[0].([]byte)
-
-		var p audit.Policy
-		err := yaml.UnmarshalStrict(data, &p)
-		if err != nil {
-			return fmt.Errorf("invalid audit-policy.yaml format: %s", err)
-		}
-
-		policy.OmitStages = append(policy.OmitStages, p.OmitStages...)
-		policy.Rules = append(policy.Rules, p.Rules...)
+func appendAdditionalPolicyRules(policy *audit.Policy, data *[]byte) error {
+	var p audit.Policy
+	err := yaml.UnmarshalStrict(*data, &p)
+	if err != nil {
+		return fmt.Errorf("invalid audit-policy.yaml format: %s", err)
 	}
 
+	policy.OmitStages = append(policy.OmitStages, p.OmitStages...)
+	policy.Rules = append(policy.Rules, p.Rules...)
+
+	return nil
+}
+
+func serializePolicy(policy *audit.Policy) (string, error) {
 	schema := runtime.NewScheme()
 	builder := runtime.SchemeBuilder{
 		audit.AddToScheme,
 	}
 	err := builder.AddToScheme(schema)
 	if err != nil {
-		return err
+		return "", err
 	}
 	serializer := json.NewSerializerWithOptions(
 		json.DefaultMetaFactory, schema, schema,
@@ -182,14 +202,11 @@ func handleAuditPolicy(input *go_hook.HookInput) error {
 	)
 	buf := bytes.NewBuffer(nil)
 	versioningCodec := versioning.NewDefaultingCodecForScheme(schema, serializer, nil, nil, nil)
-	err = versioningCodec.Encode(&policy, buf)
+	err = versioningCodec.Encode(policy, buf)
 	if err != nil {
-		return fmt.Errorf("invalid final Policy format: %s", err)
+		return "", fmt.Errorf("invalid final Policy format: %s", err)
 	}
 
 	data := strings.Replace(buf.String(), "metadata:\n  creationTimestamp: null\n", "", 1)
-
-	input.Values.Set("controlPlaneManager.internal.auditPolicy", base64.StdEncoding.EncodeToString([]byte(data)))
-
-	return nil
+	return base64.StdEncoding.EncodeToString([]byte(data)), nil
 }
