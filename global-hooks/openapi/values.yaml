@@ -293,11 +293,11 @@ x-examples:
       mode: CertManager
     resourcesRequests:
       everyNode:
-        cpu: 100m
-        memory: 1G
+        cpu: "100m"
+        memory: "1G"
       masterNode:
-        cpu: 1
-        memory: 1Gi
+        cpu: "1"
+        memory: "1Gi"
   internal:
     modules:
       resourcesRequests:
@@ -368,11 +368,11 @@ x-examples:
         secretName: plainstring
     resourcesRequests:
       everyNode:
-        cpu: 100m
-        memory: 1G
+        cpu: "100m"
+        memory: "1G"
       masterNode:
-        cpu: 1
-        memory: 1Gi
+        cpu: "1"
+        memory: "1Gi"
   internal:
     modules:
       resourcesRequests:
