@@ -108,10 +108,10 @@ func appendDropRule(policy *audit.Policy, resource audit.GroupResources) {
 }
 
 func appendDefaultPolicyRules(policy *audit.Policy) {
-	// Drop events on endpoints and events resources.
+	// Drop events on endpoints, endpointslices and events resources.
 	appendDropRule(policy, audit.GroupResources{
 		Group:     "",
-		Resources: []string{"endpoints", "events"},
+		Resources: []string{"endpoints", "endpointslices", "events"},
 	})
 	// Drop leader elections based on leases resource.
 	appendDropRule(policy, audit.GroupResources{
