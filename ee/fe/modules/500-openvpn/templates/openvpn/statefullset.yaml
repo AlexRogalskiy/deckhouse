@@ -115,9 +115,6 @@ spec:
           - mountPath: /mnt/easyrsa
             name: certs
             readOnly: false
-          - name: openvpn
-            mountPath: /app/templates/client.conf.tpl
-            subPath: client.conf.tpl
         resources:
           requests:
 {{- include "helm_lib_module_ephemeral_storage_logs_with_extra" 10 | indent 12 }}
