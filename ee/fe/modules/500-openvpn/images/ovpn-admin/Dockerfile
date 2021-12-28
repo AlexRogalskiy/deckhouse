@@ -4,7 +4,8 @@ ARG BASE_GOLANG_17_ALPINE
 
 FROM $BASE_PYTHON_ALPINE as src
 WORKDIR /app
-RUN apk update && apk add git && git clone -b 1.7.5 https://github.com/flant/ovpn-admin.git .
+COPY deckhouse.patch /app
+RUN apk update && apk add git patch && git clone -b 1.7.5 https://github.com/flant/ovpn-admin.git . && patch -p1 < /app/deckhouse.patch
 
 FROM node:14.2-alpine3.11 AS frontend
 WORKDIR /app

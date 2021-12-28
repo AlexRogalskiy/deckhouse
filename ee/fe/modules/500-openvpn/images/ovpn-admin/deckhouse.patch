@@ -1,0 +1,31 @@
+diff --git a/main.go b/main.go
+index 327b14b..02b25d3 100644
+--- a/main.go
++++ b/main.go
+@@ -848,7 +848,7 @@ func (oAdmin *OvpnAdmin) userCreate(username, password string) (bool, string) {
+ 		}
+ 	}
+ 
+-	o := runBash(fmt.Sprintf("date +%%Y-%%m-%%d\\ %%H:%%M:%%S && cd %s && easyrsa build-client-full %s nopass", *easyrsaDirPath, username))
++	o := runBash(fmt.Sprintf("date +%%Y-%%m-%%d\\ %%H:%%M:%%S && cd %s && ./easyrsa build-client-full %s nopass", *easyrsaDirPath, username))
+ 	log.Println(o)
+ 
+ 	if *authByPassword {
+@@ -909,7 +909,7 @@ func (oAdmin *OvpnAdmin) getUserStatistic(username string) clientStatus {
+ func (oAdmin *OvpnAdmin) userRevoke(username string) string {
+ 	if checkUserExist(username) {
+ 		// check certificate valid flag 'V'
+-		o := runBash(fmt.Sprintf("date +%%Y-%%m-%%d\\ %%H:%%M:%%S && cd %s && echo yes | easyrsa revoke %s && easyrsa gen-crl", *easyrsaDirPath, username))
++		o := runBash(fmt.Sprintf("date +%%Y-%%m-%%d\\ %%H:%%M:%%S && cd %s && echo yes | easyrsa revoke %s && ./easyrsa gen-crl", *easyrsaDirPath, username))
+ 		if *authByPassword {
+ 			o = runBash(fmt.Sprintf("openvpn-user revoke --db-path %s --user %s", *authDatabase, username))
+ 			//fmt.Println(o)
+@@ -947,7 +947,7 @@ func (oAdmin *OvpnAdmin) userUnrevoke(username string) string {
+ 					//fmt.Println(o)
+ 					fWrite(*indexTxtPath, renderIndexTxt(usersFromIndexTxt))
+ 					//fmt.Print(renderIndexTxt(usersFromIndexTxt))
+-					o = runBash(fmt.Sprintf("cd %s && easyrsa gen-crl", *easyrsaDirPath))
++					o = runBash(fmt.Sprintf("cd %s && ./easyrsa gen-crl", *easyrsaDirPath))
+ 					//fmt.Println(o)
+ 					if *authByPassword {
+ 						o = runBash(fmt.Sprintf("openvpn-user restore --db-path %s --user %s", *authDatabase, username))
