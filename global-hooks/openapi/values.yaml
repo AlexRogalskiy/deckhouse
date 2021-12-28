@@ -420,7 +420,7 @@ x-examples:
       Multiline
   modulesImages:
     registry: registry.deckhouse.io/deckhouse/fe
-    registryDockercfg: registry.example.com
+    registryDockercfg: Y2ZnCg==
     registryAddress: registry.deckhouse.io
     registryPath: /deckhouse/fe
     registryScheme: https
