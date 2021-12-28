@@ -17,6 +17,11 @@ global:
       - 1.20.5
     d8SpecificNodeCountByRole:
       master: 42
+  modules:
+    placement:
+      __ConstantChoices__:
+        - {}
+        - customTolerationKeys: ["key-key"]
 
 monitoringKubernetesControlPlane:
   internal:
