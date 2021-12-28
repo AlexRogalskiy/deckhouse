@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# TODO Remove after release !!!
+# TODO Remove after release (migration) !!!
 if [[ -d /var/cache/registrypackages/containerd.io ]]; then
   mv /var/cache/registrypackages/containerd.io /var/cache/registrypackages/containerd-io
 fi
