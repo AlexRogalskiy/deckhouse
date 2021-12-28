@@ -20,6 +20,7 @@
 # But there is no package jq in centos/redhat (the jq package is located in the epel repository).
 # We need to install jq from packages registry. But library for install packages requires jq.
 # To avoid this problem we use modified version of registry package helper functions, with python instead of jq.
+# When we will move to Centos 8, we should install jq from main repo.
 
 # If package registry uses self-signed certificate, we need to pass ca certificate to curl to verify certificate passed
 # from registry. But we cannot pass ca certificate to bootstrap script due to to size limitation of cloud-init scripts in some cloud providers (AWS<=16kb).
@@ -151,7 +152,8 @@ until yum install nc curl wget -y; do
   sleep 10
 done
 {{- /*
-# install jq from deckhouse registry
+# Install jq from deckhouse registry.
+# When we will move to Centos 8, we should install jq from main repo.
 */}}
 bb-rp-install "jq:{{ .images.registrypackages.jq16 }}"
 
