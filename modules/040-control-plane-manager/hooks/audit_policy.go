@@ -71,7 +71,7 @@ func filterAuditSecret(unstructured *unstructured.Unstructured) (go_hook.FilterR
 func handleAuditPolicy(input *go_hook.HookInput) error {
 	var policy audit.Policy
 
-	if input.Values.Get("controlPlaneManager.apiserver.defaultAuditPolicyEnabled").Bool() == true {
+	if input.Values.Get("controlPlaneManager.apiserver.defaultAuditPolicyEnabled").Bool() {
 		appendDefaultPolicyRules(&policy)
 	}
 
