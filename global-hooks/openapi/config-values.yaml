@@ -17,6 +17,7 @@ properties:
     description:
       Parameters of service components.
     additionalProperties: false
+    default: {}
     type: object
     properties:
       ingressClass:
@@ -39,6 +40,7 @@ properties:
         description: parameters regulating the layout of the Deckhouse components.
         type: object
         additionalProperties: false
+        default: {}
         properties:
           customTolerationKeys:
             description:
