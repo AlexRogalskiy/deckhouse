@@ -69,7 +69,7 @@ spec:
 {{- include "helm_lib_priority_class" (tuple . "cluster-low") | indent 6 }}
 {{- include "helm_lib_module_pod_security_context_run_as_user_root" . | indent 6 }}
       containers:
-      - name: {{ .Chart.Name }}
+      - name: openvpn
 {{- include "helm_lib_module_container_security_context_capabilities_drop_all_and_add" (list . (list "NET_ADMIN" "NET_RAW" "MKNOD" "SETGID" "SETUID")) | indent 8 }}
         image: {{ $.Values.global.modulesImages.registry }}:{{ $.Values.global.modulesImages.tags.openvpn.openvpn }}
         command: [ '/etc/openvpn/setup/configure.sh' ]
@@ -91,7 +91,7 @@ spec:
         resources:
           requests:
 {{- include "helm_lib_module_ephemeral_storage_logs_with_extra" 10 | indent 12 }}
-      - name: {{ .Chart.Name }}-admin
+      - name: openvpn-admin
 {{- include "helm_lib_module_container_security_context_read_only_root_filesystem_capabilities_drop_all" . | indent 8 }}
         image: {{ $.Values.global.modulesImages.registry }}:{{ $.Values.global.modulesImages.tags.openvpn.ovpnAdmin }}
         command:
@@ -115,6 +115,9 @@ spec:
           - mountPath: /mnt/easyrsa
             name: certs
             readOnly: false
+          - name: openvpn
+            mountPath: /app/templates/client.conf.tpl
+            subPath: client.conf.tpl
         resources:
           requests:
 {{- include "helm_lib_module_ephemeral_storage_logs_with_extra" 10 | indent 12 }}
