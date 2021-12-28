@@ -14,7 +14,7 @@ properties:
         A global switch to enable the HA mode for modules that support it.
         The parameter is not defined by default; the decision is made based on the `global.discovery.clusterControlPlaneIsHighlyAvailable` parameter
   modules:
-    description:
+    description: |
       Parameters of service components.
     additionalProperties: false
     default: {}
@@ -37,13 +37,14 @@ properties:
           **Do not use** DNS names (nor do create Ingress resources) that match this template to avoid conflicts with the Ingress resources created by Deckhouse.
           An example of the template: `%s.kube.company.my`. If this parameter is omitted, no Ingress resources will be created.
       placement:
-        description: parameters regulating the layout of the Deckhouse components.
+        description: |
+          Parameters regulating the layout of the Deckhouse components.
         type: object
         additionalProperties: false
         default: {}
         properties:
           customTolerationKeys:
-            description:
+            description: |
               A list of custom toleration keys; use them to allow the deployment of some critical add-ons (such as cni and csi) on dedicated nodes.
             x-doc-example: |
               ```yaml
