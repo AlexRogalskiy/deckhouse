@@ -7,7 +7,6 @@ properties:
   internal:
     additionalProperties: false
     type: object
-    default: {}
     properties:
       modules:
         default: { }
@@ -154,7 +153,6 @@ properties:
   discovery:
     additionalProperties: true
     type: object
-    default: {}
     properties:
       clusterControlPlaneIsHighlyAvailable:
         type: boolean
