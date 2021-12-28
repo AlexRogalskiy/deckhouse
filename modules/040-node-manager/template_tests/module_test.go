@@ -70,6 +70,10 @@ clusterConfiguration:
   podSubnetCIDR: 10.111.0.0/16
   podSubnetNodeCIDRPrefix: "24"
   serviceSubnetCIDR: 10.222.0.0/16
+  packagesProxy:
+    uri: https://example.com
+    username: user
+    password: passwd
 `
 
 // Defaults from openapi/config-values.yaml.
