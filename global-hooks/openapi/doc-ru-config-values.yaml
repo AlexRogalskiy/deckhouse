@@ -3,14 +3,12 @@ properties:
   storageClass:
     type: string
     x-doc-default: null
-    x-examples: [ "storage-class" ]
     description: |
       Имя storage class, который будет использоваться для всех служебных компонентов (prometheus, grafana, openvpn, ...).
         * По умолчанию — null, а значит служебные будут использовать `cluster.defaultStorageClass` (который определяется автоматически), а если такого нет — `emptyDir`.
         * Этот параметр имеет смысл использовать только в исключительных ситуациях.
     highAvailability:
       type: boolean
-      x-examples: [ true ]
       description: |
         Глобальный включатель режима отказоустойчивости для модулей, которые это поддерживают.
         По умолчанию не определён и решение принимается на основе autodiscovery-параметра `global.discovery.clusterControlPlaneIsHighlyAvailable`.
@@ -23,13 +21,11 @@ properties:
       ingressClass:
         type: string
         default: nginx
-        x-examples: [ "my-ingress" ]
         description: |
           Класс Ingress-контроллера, который используется для служебных компонентов.
           По умолчанию `nginx`.
       publicDomainTemplate:
         type: string
-        x-examples: [ "%s.example.com" ]
         # only check that is containing %s
         pattern: '.*%s.*'
         description: |
@@ -62,15 +58,6 @@ properties:
           Способ реализации HTTPS, используемый служебными компонентами.
         type: object
         additionalProperties: false
-        x-examples:
-          - certManager:
-              clusterIssuerName: letsencrypt
-            mode: CertManager
-          - mode: Disabled
-          - mode: OnlyInURI
-          - mode: CustomCertificate
-            customCertificate:
-              secretName: plainstring
         properties:
           mode:
             type: string
@@ -110,39 +97,6 @@ properties:
                   Данный секрет должен быть в формате [kubernetes.io/tls](https://kubernetes.github.io/ingress-nginx/user-guide/tls/#tls-secrets).
                 default: "false"
                 x-doc-default: 'false'
-    x-examples:
-      - publicDomainTemplate: "%s.example.com"
-        placement:
-          customTolerationKey:
-            - dedicated.example.com
-            - node-dedicated.example.com/master
-        https:
-          mode: CustomCertificate
-          customCertificate:
-            secretName: plainstring
-        resourcesRequests:
-          everyNode:
-            cpu: 42m
-            memory: 2G
-          masterNode:
-            cpu: 2
-            memory: 512Mi
-      - publicDomainTemplate: "%s.example.com"
-        placement:
-          customTolerationKey:
-            - dedicated.example.com
-            - node-dedicated.example.com/master
-        https:
-          mode: CertManager
-          certManager:
-            clusterIssuerName: myown
-        resourcesRequests:
-          everyNode:
-            cpu: 42m
-            memory: 2G
-          masterNode:
-            cpu: 2
-            memory: 512Mi
       resourcesRequests:
         description: |
           Количество CPU и memory, выделяемые для работы служебных компонентов.
