@@ -379,6 +379,8 @@ x-examples:
         milliCpuControlPlane: 1024
         memoryControlPlane: 536870912
   clusterConfiguration:
+    apiVersion: deckhouse.io/v1
+    kind: ClusterConfiguration
     podSubnetNodeCIDRPrefix: "24"
     podSubnetCIDR: 10.244.0.0/16
     serviceSubnetCIDR: 192.168.0.0/16
