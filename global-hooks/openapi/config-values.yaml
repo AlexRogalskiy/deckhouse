@@ -1,5 +1,6 @@
 type: object
 default: {}
+additionalProperties: false
 properties:
   storageClass:
     type: string
@@ -61,6 +62,7 @@ properties:
           The HTTPS implementation used by the service components
         type: object
         additionalProperties: false
+        default: {}
         properties:
           mode:
             type: string
@@ -79,6 +81,7 @@ properties:
           certManager:
             type: object
             additionalProperties: false
+            default: {}
             properties:
               clusterIssuerName:
                 type: string
@@ -103,10 +106,12 @@ properties:
         description: |
           The amount of CPU and memory allocated to service components.
         type: object
+        default: {}
         additionalProperties: false
         properties:
           everyNode:
             type: object
+            default: {}
             additionalProperties: false
             description: |
               System components running on every cluster node (usually DaemonSets)

@@ -2,11 +2,12 @@ x-extend:
   schema: config-values.yaml
 type: object
 default: {}
-additionalProperties: true
+additionalProperties: false
 properties:
   internal:
     additionalProperties: false
     type: object
+    default: {}
     properties:
       modules:
         default: { }
@@ -153,6 +154,7 @@ properties:
   discovery:
     additionalProperties: true
     type: object
+    default: {}
     properties:
       clusterControlPlaneIsHighlyAvailable:
         type: boolean
@@ -231,6 +233,9 @@ properties:
           The CA for verification requests to our custom modules from clients inside cluster.
           It gets from kube-system/extension-apiserver-authentication config map
   modulesImages:
+    additionalProperties: true
+    type: object
+    default: {}
     properties:
       registryPath:
         type: string
@@ -275,8 +280,6 @@ properties:
           That file generated on build stage.
           See modules_images_werf and modules_images_werf.yaml for additional information.
           Values from this map uses in helm teplates for generating container image address in deployments sts...
-    additionalProperties: true
-    type: object
 x-examples:
 - storageClass: "storage-class"
   highAvailability: true
