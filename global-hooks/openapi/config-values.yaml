@@ -5,6 +5,7 @@ properties:
   storageClass:
     type: string
     x-doc-default: null
+    default: null
     description: |
       The storage class to use with all service components (prometheus, grafana, openvpn, ...).
         * By default, it is set to null. In this case, service components use `cluster.defaultStorageClass`
@@ -12,6 +13,7 @@ properties:
         * Use this parameter only in exceptional circumstances.
     highAvailability:
       type: boolean
+      default: false
       description: |
         A global switch to enable the HA mode for modules that support it.
         The parameter is not defined by default; the decision is made based on the `global.discovery.clusterControlPlaneIsHighlyAvailable` parameter
