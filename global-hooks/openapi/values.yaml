@@ -137,7 +137,6 @@ properties:
         required: [ cloud ]
   clusterIsBootstrapped:
     type: boolean
-    default: false
     description: |
       It indicates the cluster is bootstraped.
       The cluster is considered bootstrapped if configmap d8-system/d8-cluster-is-bootstraped exists or

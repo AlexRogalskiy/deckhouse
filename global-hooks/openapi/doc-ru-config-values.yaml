@@ -10,7 +10,6 @@ properties:
         * Этот параметр имеет смысл использовать только в исключительных ситуациях.
   highAvailability:
     type: boolean
-    default: false
     description: |
       Глобальный включатель режима отказоустойчивости для модулей, которые это поддерживают.
       По умолчанию не определён и решение принимается на основе autodiscovery-параметра `global.discovery.clusterControlPlaneIsHighlyAvailable`.
