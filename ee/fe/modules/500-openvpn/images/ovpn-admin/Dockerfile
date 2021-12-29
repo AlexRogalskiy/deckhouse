@@ -1,8 +1,8 @@
-ARG BASE_PYTHON_ALPINE
+ARG BASE_ALPINE
 ARG BASE_NODE_16_ALPINE
 ARG BASE_GOLANG_17_ALPINE
 
-FROM $BASE_PYTHON_ALPINE as src
+FROM $BASE_ALPINE as src
 WORKDIR /app
 COPY deckhouse.patch /
 RUN apk update && apk add git patch && git clone -b 1.7.5 https://github.com/flant/ovpn-admin.git . && patch -p1 < /deckhouse.patch
@@ -17,7 +17,7 @@ WORKDIR /app
 COPY --from=src /app /app
 RUN go build .
 
-FROM $BASE_PYTHON_ALPINE
+FROM $BASE_ALPINE
 WORKDIR /app
 RUN apk update && apk add bash openssl
 COPY --from=backend /app/ovpn-admin /app/
