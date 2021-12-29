@@ -23,3 +23,4 @@ RUN apk update && apk add bash openssl
 COPY --from=backend /app/ovpn-admin /app/
 COPY --from=frontend /app/frontend/static /app/frontend/static
 COPY client.conf.tpl /app/templates/
+COPY rootfs /
