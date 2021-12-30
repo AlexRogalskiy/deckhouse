@@ -93,7 +93,6 @@ properties:
                   (currently, `letsencrypt`, `letsencrypt-staging`, `selfsigned` are available; also, you can define your own).
           customCertificate:
             type: object
-            default: {}
             additionalProperties: false
             properties:
               secretName:
