@@ -13,7 +13,7 @@ To add one or more master nodes to a cloud cluster, follow the following steps:
 - Determine the Deckhouse version and edition used in the cluster by running the following command on the master node or a host with configured kubectl access to the cluster: 
   ```shell
   kubectl -n d8-system get deployment deckhouse \
-  -o jsonpath='versio-{.metadata.annotations.core\.deckhouse\.io\/version}, edition-{.metadata.annotations.core\.deckhouse\.io\/edition}' \
+  -o jsonpath='version-{.metadata.annotations.core\.deckhouse\.io\/version}, edition-{.metadata.annotations.core\.deckhouse\.io\/edition}' \
   | tr '[:upper:]' '[:lower:]'
   ```
 - Run the corresponding version and edition of the Deckhouse installer:
