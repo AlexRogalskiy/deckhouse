@@ -97,7 +97,7 @@ spec:
         command:
         - /bin/sh
         - -c
-        - /app/ovpn-admin --listen.host="127.0.0.1" --listen.port="8000" --role="master" --ovpn.server.behindLB --ovpn.service="openvpn-external" --mgmt=main=127.0.0.1:8989 --easyrsa.index-path="/mnt/easyrsa/pki/index.txt"
+        - /app/ovpn-admin --listen.host="127.0.0.1" --listen.port="8000" --role="master" --ovpn.server.behindLB --ovpn.service="openvpn-external" --mgmt=main=127.0.0.1:8989"
         env:
         - name: POD_NAMESPACE
           valueFrom:
