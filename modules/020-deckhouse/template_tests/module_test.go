@@ -32,8 +32,6 @@ func Test(t *testing.T) {
 
 const (
 	globalValues = `
-project: my_project
-clusterName: my_cluster
 deckhouseVersion: test
 enabledModules: ["vertical-pod-autoscaler-crd", "prometheus", "operator-prometheus-crd"]
 discovery:
