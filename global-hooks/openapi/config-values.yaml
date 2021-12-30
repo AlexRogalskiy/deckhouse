@@ -63,7 +63,6 @@ properties:
           The HTTPS implementation used by the service components
         type: object
         additionalProperties: false
-        default: {}
         properties:
           mode:
             type: string

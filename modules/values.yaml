@@ -1,2 +1,13 @@
-# all defaults move to ../global-hooks/openapi
-global: {}
+# Default global values section
+global:
+  modules:
+    ingressClass: nginx
+    placement: {}
+    https:
+      mode: CertManager
+      certManager:
+        clusterIssuerName: letsencrypt
+    resourcesRequests:
+      everyNode:
+        cpu: 300m
+        memory: 512Mi
