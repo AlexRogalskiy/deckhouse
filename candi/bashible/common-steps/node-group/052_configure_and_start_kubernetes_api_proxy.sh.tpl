@@ -22,7 +22,7 @@ fi
 if bb-is-ubuntu-version? 20.04 ; then
   bb-rp-install "nginx:{{ .images.registrypackages.nginxUbuntu1202Focal }}"
 fi
-{{- else if eq .bundle "centos-7" }}
+{{- else if eq .bundle "centos" }}
 bb-rp-install "nginx:{{ .images.registrypackages.nginxCentos71202 }}"
 {{- end }}
 

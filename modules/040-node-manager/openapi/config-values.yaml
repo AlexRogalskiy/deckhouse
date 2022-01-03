@@ -21,12 +21,12 @@ properties:
     type: array
     default:
       - "ubuntu-lts"
-      - "centos-7"
+      - "centos"
     x-examples:
       - ["ubuntu-lts"]
     items:
       type: string
-      enum: [ubuntu-lts, centos-7]
+      enum: [ubuntu-lts, centos]
     description: |
       Names of available bashible OS bundles to reduce helm release size.
 

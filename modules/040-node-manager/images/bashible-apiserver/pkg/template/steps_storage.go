@@ -90,7 +90,7 @@ func (s *StepsStorage) readBundleTemplates(bundle string) (map[string][]byte, er
 //      cloud-providers/{provider}/bashible/common-steps/{target}
 //
 // Where
-//      bundle   = "centos-7" | "ubuntu-lts"
+//      bundle   = "centos" | "ubuntu-lts"
 //      target   = "all" | "node-group"
 //      provider = "" | "aws" | "gcp" | "openstack" | ...
 func (s *StepsStorage) lookupDirs(bundle string) []string {

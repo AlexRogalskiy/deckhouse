@@ -52,7 +52,7 @@ Template:
   Name: node-manager/templates/bashible-apiserver/deployment.yaml
 allowedBundles:
   - ubuntu-lts
-  - centos-7
+  - centos
 allowedKubernetesVersions:
   - "1.16"
   - "1.17"

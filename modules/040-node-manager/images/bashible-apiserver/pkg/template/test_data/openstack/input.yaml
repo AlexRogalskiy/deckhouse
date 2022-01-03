@@ -45,7 +45,7 @@ kubernetesCA: |
 
 allowedBundles:
   - ubuntu-lts
-  - centos-7
+  - centos
 allowedKubernetesVersions:
   - "1.16"
   - "1.17"

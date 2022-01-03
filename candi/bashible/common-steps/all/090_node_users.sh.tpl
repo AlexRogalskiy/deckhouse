@@ -62,7 +62,7 @@ function put_user_ssh_key() {
 
 {{- if eq .bundle "ubuntu-lts" }}
 sudoGroup="sudo"
-{{- else if eq .bundle "centos-7" }}
+{{- else if eq .bundle "centos" }}
 sudoGroup="wheel"
 {{- end }}
 mainGroup="100" # users
