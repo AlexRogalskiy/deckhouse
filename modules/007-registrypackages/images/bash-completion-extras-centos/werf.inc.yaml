@@ -1,10 +1,10 @@
 {{- $version := "2.1-11" }}
 {{- $image_version := $version | replace "." "-" }}
 ---
-image: {{ $.ModuleName }}/{{ $.ImageName }}-{{ $image_version }}
+image: {{ $.ModuleName }}/{{ $.ImageName }}7-{{ $image_version }}
 from: spotify/scratch
 import:
-- artifact: {{ $.ModuleName }}/{{ $.ImageName }}-artifact-{{ $image_version }}
+- artifact: {{ $.ModuleName }}/{{ $.ImageName }}7-artifact-{{ $image_version }}
   add: /
   to: /
   includePaths:
@@ -13,7 +13,7 @@ import:
   - uninstall
   before: setup
 ---
-artifact: {{ $.ModuleName }}/{{ $.ImageName }}-artifact-{{ $image_version }}
+artifact: {{ $.ModuleName }}/{{ $.ImageName }}7-artifact-{{ $image_version }}
 from: {{ env "BASE_ALPINE" }}
 git:
   - add: /modules/007-{{ $.ModuleName }}/images/{{ $.ImageName }}/scripts

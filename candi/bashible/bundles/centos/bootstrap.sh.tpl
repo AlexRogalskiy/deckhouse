@@ -155,6 +155,9 @@ done
 # Install jq from deckhouse registry.
 # When we will move to Centos 8, we should install jq from main repo.
 */}}
-bb-rp-install "jq:{{ .images.registrypackages.jq16 }}"
-
+if bb-is-centos-version? 7; then
+  bb-rp-install "jq:{{ .images.registrypackages.jq16 }}"
+else
+  yum install jq -y
+fi
 mkdir -p /var/lib/bashible/

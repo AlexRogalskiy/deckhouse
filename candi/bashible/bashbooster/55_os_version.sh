@@ -20,3 +20,12 @@ bb-is-ubuntu-version?() {
     return 1
   fi
 }
+
+bb-is-centos-version?() {
+  local CENTOS_VERSION=$1
+  if [ "$(source /etc/os-release; echo ${VERSION_ID})" == "${CENTOS_VERSION}" ] ; then
+    return 0
+  else
+    return 1
+  fi
+}
