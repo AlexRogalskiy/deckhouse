@@ -17,7 +17,8 @@ yum-config-manager --save --setopt=proxy={{ .packagesProxy.uri }} main
 {{- else }}
 if bb-is-centos-version? 7; then
   yum-config-manager --save --setopt=proxy=_none_
-else
+fi
+if bb-is-centos-version? 8; then
   yum-config-manager --save --setopt=proxy=
 fi
 {{- end }}

@@ -25,7 +25,8 @@ bb-rp-install "jq:{{ .images.registrypackages.jq16 }}" "curl:{{ .images.registry
 
 if bb-is-centos-version? 7; then
   bb-rp-install "bash-completion-extras:{{ .images.registrypackages.bashCompletionExtrasCentos72111 }}" "inotify-tools:{{ .images.registrypackages.inotifyToolsCentos73149 }}"
-else
-  bb-rp-install "inotify-tools:{{ .images.registrypackages.inotifyToolsCentos73149 }}"
+fi
+if bb-is-centos-version? 8; then
+  bb-rp-install "inotify-tools:{{ .images.registrypackages.inotifyToolsCentos831419 }}"
 fi
 bb-yum-remove yum-cron
