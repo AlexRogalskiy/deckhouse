@@ -86,7 +86,7 @@ if [[ "$should_install_containerd" == true ]]; then
 
   bb-deckhouse-get-disruptive-update-approval
 
-  containerd_tag="{{- index .images.registrypackages (printf "containerdCentos7%s" ($desired_version_containerd | replace "containerd.io-" "" | replace "." "_" | replace "-" "_" | camelcase )) }}"
+  containerd_tag="{{- index .images.registrypackages (printf "containerdCentos%s" ($desired_version_containerd | replace "containerd.io-" "" | replace "." "_" | replace "-" "_" | camelcase )) }}"
 
   bb-rp-install "containerd-io:${containerd_tag}"
 fi
@@ -110,7 +110,7 @@ if [[ "$should_install_docker" == true ]]; then
 
   bb-flag-set new-docker-installed
 
-  docker_tag="{{- index .images.registrypackages (printf "dockerCentos7%s" ($desired_version_docker | replace "docker-ce-" "" | replace "." "_" | replace ":" "_" | camelcase )) }}"
+  docker_tag="{{- index .images.registrypackages (printf "dockerCentos%s" ($desired_version_docker | replace "docker-ce-" "" | replace "." "_" | replace ":" "_" | camelcase )) }}"
 
   bb-rp-install "docker-ce:${docker_tag}"
 fi
