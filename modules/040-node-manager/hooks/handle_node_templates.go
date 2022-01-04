@@ -290,7 +290,7 @@ func applyNodeTemplate(nodeObj *v1.Node, node NodeSettings, nodeGroup NodeSettin
 		if labelsChanged {
 			nodeObj.SetLabels(newLabels)
 		}
-		if labelsChanged {
+		if annotationsChanged {
 			nodeObj.SetAnnotations(newAnnotations)
 		}
 	}
@@ -311,7 +311,7 @@ func applyNodeTemplate(nodeObj *v1.Node, node NodeSettings, nodeGroup NodeSettin
 func ApplyTemplateMap(actual, template, lastApplied map[string]string) (map[string]string, bool) {
 	changed := false
 	excess := ExcessMapKeys(lastApplied, template)
-	newLabels := map[string]string{}
+	newMap := map[string]string{}
 
 	for k, v := range actual {
 		// Ignore keys removed from template.
@@ -319,19 +319,19 @@ func ApplyTemplateMap(actual, template, lastApplied map[string]string) (map[stri
 			changed = true
 			continue
 		}
-		newLabels[k] = v
+		newMap[k] = v
 	}
 
 	// Merge with values from template.
 	for k, v := range template {
-		oldVal, ok := newLabels[k]
+		oldVal, ok := newMap[k]
 		if !ok || oldVal != v {
 			changed = true
 		}
-		newLabels[k] = v
+		newMap[k] = v
 	}
 
-	return newLabels, changed
+	return newMap, changed
 }
 
 // ExcessMapKeys returns keys from a without keys from b.
